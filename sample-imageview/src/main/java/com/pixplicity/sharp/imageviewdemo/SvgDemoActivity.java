@@ -32,6 +32,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -45,6 +46,8 @@ import java.util.Random;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class SvgDemoActivity extends AppCompatActivity {
+
+    private static final String TAG = SvgDemoActivity.class.getSimpleName();
 
     private ImageView mImageView;
     private Button mButton;
@@ -86,22 +89,22 @@ public class SvgDemoActivity extends AppCompatActivity {
         mSvg.setOnElementListener(new OnSvgElementListener() {
 
             @Override
-            public void onSvgStart(Canvas canvas) {
+            public void onSvgStart(Canvas canvas, RectF bounds) {
                 if (FLIP) {
                     canvas.save();
-                    canvas.scale(-1f, 1f, canvas.getWidth() / 2, 0);
+                    canvas.scale(-1f, 1f, bounds.width() / 2, 0);
                 }
             }
 
             @Override
-            public void onSvgEnd(Canvas canvas) {
+            public void onSvgEnd(Canvas canvas, RectF bounds) {
                 if (FLIP) {
                     canvas.restore();
                 }
             }
 
             @Override
-            public <T> T onSvgElement(String id, T element, RectF bounds, Canvas canvas, Paint paint) {
+            public <T> T onSvgElement(String id, T element, RectF elementBounds, Canvas canvas, RectF canvasBounds, Paint paint) {
                 if (changeColor && ("shirt".equals(id) || "hat".equals(id) || "pants".equals(id))) {
                     Random random = new Random();
                     paint.setColor(Color.argb(255, random.nextInt(256),
@@ -109,7 +112,7 @@ public class SvgDemoActivity extends AppCompatActivity {
                 }
                 if (needsFlip(id, element)) {
                     canvas.save();
-                    RectF r = new RectF(0, 0, canvas.getWidth(), 0);
+                    RectF r = new RectF(canvasBounds);
                     Matrix m = canvas.getMatrix();
                     m.invert(m);
                     m.mapRect(r);
