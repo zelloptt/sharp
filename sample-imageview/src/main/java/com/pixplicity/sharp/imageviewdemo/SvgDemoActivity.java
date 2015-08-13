@@ -25,7 +25,9 @@ package com.pixplicity.sharp.imageviewdemo;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -50,6 +52,8 @@ public class SvgDemoActivity extends AppCompatActivity {
     private PhotoViewAttacher mAttacher;
     private Sharp mSvg;
 
+    private static final boolean FLIP = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,9 +65,9 @@ public class SvgDemoActivity extends AppCompatActivity {
         mImageView = (ImageView) findViewById(R.id.iv_image);
         mButton = (Button) findViewById(R.id.bt_button);
 
-        mSvg = Sharp.loadResource(getResources(), R.drawable.cartman);
-        // If you want to load typefaces from assets:
-        //          .withAssets(getAssets());
+        mSvg = Sharp.loadResource(getResources(), R.drawable.text)
+                // If you want to load typefaces from assets:
+                .withAssets(getAssets());
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,24 +87,50 @@ public class SvgDemoActivity extends AppCompatActivity {
 
             @Override
             public void onSvgStart(Canvas canvas) {
+                if (FLIP) {
+                    canvas.save();
+                    canvas.scale(-1f, 1f, canvas.getWidth() / 2, 0);
+                }
             }
 
             @Override
             public void onSvgEnd(Canvas canvas) {
+                if (FLIP) {
+                    canvas.restore();
+                }
             }
 
             @Override
-            public <T> T onSvgElement(String id, T element, Canvas canvas, Paint paint) {
+            public <T> T onSvgElement(String id, T element, RectF bounds, Canvas canvas, Paint paint) {
                 if (changeColor && ("shirt".equals(id) || "hat".equals(id) || "pants".equals(id))) {
                     Random random = new Random();
                     paint.setColor(Color.argb(255, random.nextInt(256),
                             random.nextInt(256), random.nextInt(256)));
+                }
+                if (needsFlip(id, element)) {
+                    canvas.save();
+                    RectF r = new RectF(0, 0, canvas.getWidth(), 0);
+                    Matrix m = canvas.getMatrix();
+                    m.invert(m);
+                    m.mapRect(r);
+                    float px = (r.left + r.right) / 2;
+                    canvas.scale(-1f, 1f, px, 0);
                 }
                 return element;
             }
 
             @Override
             public <T> void onSvgElementDrawn(String id, T element, Canvas canvas) {
+                if (needsFlip(id, element)) {
+                    canvas.restore();
+                }
+            }
+
+            private <T> boolean needsFlip(String id, T element) {
+                if (!FLIP) {
+                    return false;
+                }
+                return element instanceof Sharp.SvgHandler.SvgText || (id != null && id.endsWith("noflip"));
             }
 
         });
@@ -120,6 +150,8 @@ public class SvgDemoActivity extends AppCompatActivity {
                     drawable,
                     null, null, null);
         }
+        // Not applicable to this sample
+        mButton.setVisibility(View.GONE);
 
         mAttacher.update();
     }
