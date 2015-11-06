@@ -65,3 +65,7 @@ You don't need to disable hardware acceleration on your entire application. Only
 ## Known issues
 
 1. Text size and position isn't accurate. It's recommended to convert all text to paths in order for it to appear pixel-perfect.
+
+## License
+
+Licensed under the Apache license 2.0.
