@@ -108,7 +108,7 @@ public class SvgDemoActivity extends AppCompatActivity {
         SharpPicture picture = mSvg.getSharpPicture();
 
         {
-            Drawable drawable = picture.createDrawable(mImageView);
+            Drawable drawable = picture.createDrawable(mImageView, mImageView.getMaxWidth());
             mImageView.setImageDrawable(drawable);
         }
 
