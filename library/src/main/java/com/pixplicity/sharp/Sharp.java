@@ -205,22 +205,6 @@ public abstract class Sharp {
         };
     }
 
-    @NonNull
-    private static InputStream readInputStream(InputStream inputStream) {
-        StringBuilder svgData = new StringBuilder();
-        Scanner scanner = new Scanner(inputStream);
-        String lineSeparator = System.getProperty("line.separator");
-        try {
-            while (scanner.hasNextLine()) {
-                svgData.append(scanner.nextLine()).append(lineSeparator);
-            }
-        } finally {
-            scanner.close();
-        }
-        inputStream = new ByteArrayInputStream(svgData.toString().getBytes());
-        return inputStream;
-    }
-
     /**
      * Parse SVG data from an Android application asset.
      *
@@ -281,6 +265,22 @@ public abstract class Sharp {
     @SuppressWarnings("unused")
     public static Path loadPath(String pathString) {
         return doPath(pathString);
+    }
+
+    @NonNull
+    private static InputStream readInputStream(InputStream inputStream) {
+        StringBuilder svgData = new StringBuilder();
+        Scanner scanner = new Scanner(inputStream);
+        String lineSeparator = System.getProperty("line.separator");
+        try {
+            while (scanner.hasNextLine()) {
+                svgData.append(scanner.nextLine()).append(lineSeparator);
+            }
+        } finally {
+            scanner.close();
+        }
+        inputStream = new ByteArrayInputStream(svgData.toString().getBytes());
+        return inputStream;
     }
 
     private Sharp() {
