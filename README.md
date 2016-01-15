@@ -62,6 +62,19 @@ Excellent question! Aside from the fact that PictureDrawable doesn't render corr
 
 You don't need to disable hardware acceleration on your entire application. Only *individual views* need to have the layer type changed, and providing your view into `SharpPicture.createDrawable()` takes care of this for you.
 
+## Download
+
+Download [the latest AAR][download] or grab from Bintray using Gradle:
+
+    repositories {
+        maven { url "http://dl.bintray.com/pixplicity/android" }
+    }
+    dependencies {
+        compile 'com.pixplicity.sharp:library:1.0@aar'
+    }
+
+[download]: https://bintray.com/artifact/download/pixplicity/android/com/pixplicity/sharp/library/1.0/library-1.0.aar
+
 ## Known issues
 
 1. Text size and position isn't accurate. It's recommended to convert all text to paths in order for it to appear pixel-perfect.
