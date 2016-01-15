@@ -24,7 +24,7 @@ Download [the latest AAR][download] or grab from Bintray using Gradle:
 
 [![Download](https://api.bintray.com/packages/pixplicity/android/Sharp/images/download.svg)](https://bintray.com/pixplicity/android/Sharp/_latestVersion)
 
-Specify the latest version from Bintray into `VERSION_HERE`.
+**Important:** Specify the latest version from Bintray as `[VERSION_HERE]`.
 
 [download]: https://bintray.com/artifact/download/pixplicity/android/com/pixplicity/sharp/library/1.0/library-1.0.aar
 
