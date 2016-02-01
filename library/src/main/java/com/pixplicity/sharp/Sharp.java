@@ -44,6 +44,7 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Looper;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.util.Log;
@@ -99,9 +100,8 @@ public abstract class Sharp {
     private final SvgHandler mSvgHandler;
 
     // FIXME make hash map
-    private Integer mSearchColor = null;
-    private Integer mReplaceColor = null;
-    private HashMap<String, Integer> mIdToColor = null;
+    private HashMap<Integer, Integer> mReplaceByColor = null;
+    private HashMap<String, Integer> mReplaceById = null;
 
     private boolean mWhiteMode = false;
 
@@ -145,7 +145,7 @@ public abstract class Sharp {
      * Parse SVG data from an input stream.
      *
      * @param svgData the input stream, with SVG XML data in UTF-8 character encoding.
-     * @return the parsed SVG.
+     * @return this Sharp object
      */
     @SuppressWarnings("unused")
     public static Sharp loadInputStream(final InputStream svgData) {
@@ -164,7 +164,7 @@ public abstract class Sharp {
      * Parse SVG data from a text.
      *
      * @param svgData the text containing SVG XML data.
-     * @return the parsed SVG.
+     * @return this Sharp object
      */
     @SuppressWarnings("unused")
     public static Sharp loadString(final String svgData) {
@@ -184,7 +184,7 @@ public abstract class Sharp {
      *
      * @param resources the Android context resources.
      * @param resId     the ID of the raw resource SVG.
-     * @return the parsed SVG.
+     * @return this Sharp object
      */
     @SuppressWarnings("unused")
     public static Sharp loadResource(final Resources resources,
@@ -210,7 +210,7 @@ public abstract class Sharp {
      *
      * @param assetMngr the Android asset manager.
      * @param svgPath   the path to the SVG file in the application's assets.
-     * @return the parsed SVG.
+     * @return this Sharp object
      */
     @SuppressWarnings("unused")
     public static Sharp loadAsset(final AssetManager assetMngr,
@@ -236,7 +236,7 @@ public abstract class Sharp {
      * Parse SVG data from a file.
      *
      * @param imageFile the input stream, with SVG XML data in UTF-8 character encoding.
-     * @return the parsed SVG.
+     * @return this Sharp object
      */
     @SuppressWarnings("unused")
     public static Sharp loadFile(final File imageFile) {
@@ -300,32 +300,57 @@ public abstract class Sharp {
     }
 
     @SuppressWarnings("unused")
-    public Sharp setIdToColor(HashMap<String, Integer> idToColor) {
-        mIdToColor = idToColor;
+    public Sharp setColorReplacement(HashMap<String, Integer> idToColor) {
+        mReplaceById = idToColor;
+        return this;
+    }
+
+    /**
+     * Replaces any element with a specific ID with a replacement color.
+     *
+     * @param id           element ID to perform replacement on
+     * @param replaceColor {@link Color} to use for element
+     * @return this Sharp object
+     */
+    @SuppressWarnings("unused")
+    public Sharp addColorReplacement(String id, @ColorInt int replaceColor) {
+        if (mReplaceById == null) {
+            mReplaceById = new HashMap<>();
+        }
+        mReplaceById.put(id, replaceColor);
         return this;
     }
 
     @SuppressWarnings("unused")
-    public Sharp addColorReplacement(Integer searchColor, Integer replaceColor) {
-        mSearchColor = searchColor;
-        mReplaceColor = replaceColor;
-        return this;
-    }
-
-    @SuppressWarnings("unused")
-    public int getReplacementColor(int color) {
-        if (mSearchColor != null && mSearchColor == color) {
-            return mReplaceColor;
+    public int getColorForId(String id, @ColorInt int color) {
+        if (mReplaceById != null) {
+            if (id.length() != 0 && mReplaceById.containsKey(id)) {
+                color = mReplaceById.get(id);
+            }
         }
         return color;
     }
 
+    /**
+     * Replaces any search color with a replacement color.
+     *
+     * @param searchColor  color to match
+     * @param replaceColor replacement color
+     * @return this Sharp object
+     */
     @SuppressWarnings("unused")
-    public int getColorForId(String id, int color) {
-        if (mIdToColor != null) {
-            if (id.length() != 0 && mIdToColor.containsKey(id)) {
-                color = mIdToColor.get(id);
-            }
+    public Sharp addColorReplacement(@ColorInt int searchColor, @ColorInt int replaceColor) {
+        if (mReplaceByColor == null) {
+            mReplaceByColor = new HashMap<>();
+        }
+        mReplaceByColor.put(searchColor, replaceColor);
+        return this;
+    }
+
+    @SuppressWarnings("unused")
+    public int getReplacementColor(@ColorInt int color) {
+        if (mReplaceByColor != null && mReplaceByColor.containsKey(color)) {
+            return mReplaceByColor.get(color);
         }
         return color;
     }
