@@ -46,6 +46,7 @@ import android.os.Build;
 import android.os.Looper;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.View;
@@ -94,12 +95,10 @@ public abstract class Sharp {
     static final String TAG = Sharp.class.getSimpleName();
 
     private static String sAssumedUnit;
-    private static float sDensity = 1.0f;
     private static HashMap<String, String> sTextDynamic = null;
 
     private final SvgHandler mSvgHandler;
 
-    // FIXME make hash map
     private HashMap<Integer, Integer> mReplaceByColor = null;
     private HashMap<String, Integer> mReplaceById = null;
 
@@ -299,7 +298,11 @@ public abstract class Sharp {
         return this;
     }
 
+    /**
+     * @deprecated See notes in {@link #addColorReplacement(int, int)}.
+     */
     @SuppressWarnings("unused")
+    @Deprecated
     public Sharp setColorReplacement(HashMap<String, Integer> idToColor) {
         mReplaceById = idToColor;
         return this;
@@ -311,6 +314,8 @@ public abstract class Sharp {
      * @param id           element ID to perform replacement on
      * @param replaceColor {@link Color} to use for element
      * @return this Sharp object
+     * @deprecated This method will be removed in a future release. It's recommended to register an
+     * {@link OnSvgElementListener} to modify the paint.
      */
     @SuppressWarnings("unused")
     public Sharp addColorReplacement(String id, @ColorInt int replaceColor) {
@@ -321,7 +326,11 @@ public abstract class Sharp {
         return this;
     }
 
+    /**
+     * @deprecated See notes in {@link #addColorReplacement(String, int)}.
+     */
     @SuppressWarnings("unused")
+    @Deprecated
     public int getColorForId(String id, @ColorInt int color) {
         if (mReplaceById != null) {
             if (id.length() != 0 && mReplaceById.containsKey(id)) {
@@ -337,8 +346,11 @@ public abstract class Sharp {
      * @param searchColor  color to match
      * @param replaceColor replacement color
      * @return this Sharp object
+     * @deprecated This method will be removed in a future release. It's recommended to register an
+     * {@link OnSvgElementListener} to modify the paint.
      */
     @SuppressWarnings("unused")
+    @Deprecated
     public Sharp addColorReplacement(@ColorInt int searchColor, @ColorInt int replaceColor) {
         if (mReplaceByColor == null) {
             mReplaceByColor = new HashMap<>();
@@ -347,7 +359,11 @@ public abstract class Sharp {
         return this;
     }
 
+    /**
+     * @deprecated See notes in {@link #addColorReplacement(int, int)}.
+     */
     @SuppressWarnings("unused")
+    @Deprecated
     public int getReplacementColor(@ColorInt int color) {
         if (mReplaceByColor != null && mReplaceByColor.containsKey(color)) {
             return mReplaceByColor.get(color);
@@ -615,7 +631,7 @@ public abstract class Sharp {
             int j = attr.indexOf(")", i);
             if (j > -1) {
                 NumberParse np = parseNumbers(attr.substring(i, j));
-                if (np.mNumbers.size() > 0) {
+                if (np.size() > 0) {
                     return np;
                 }
             }
@@ -623,86 +639,94 @@ public abstract class Sharp {
         return null;
     }
 
+    @Nullable
     private static Matrix parseTransform(String s) {
-        Matrix matrix = new Matrix();
-        boolean transformed = false;
+        Matrix matrix = null;
 
         if (s.startsWith("matrix(")) {
             NumberParse np = parseNumbers(s.substring("matrix(".length()));
-            if (np.mNumbers.size() == 6) {
+            if (np.size() == 6) {
+                if (matrix == null) {
+                    matrix = new Matrix();
+                }
                 matrix.setValues(new float[]{
                         // Row 1
-                        np.mNumbers.get(0),
-                        np.mNumbers.get(2),
-                        np.mNumbers.get(4),
+                        np.getNumber(0),
+                        np.getNumber(2),
+                        np.getNumber(4),
                         // Row 2
-                        np.mNumbers.get(1),
-                        np.mNumbers.get(3),
-                        np.mNumbers.get(5),
+                        np.getNumber(1),
+                        np.getNumber(3),
+                        np.getNumber(5),
                         // Row 3
                         0,
                         0,
                         1,
                         });
-                transformed = true;
             }
         }
 
         NumberParse np = readTransform(s, "scale");
         if (np != null) {
-            float sx = np.mNumbers.get(0);
+            float sx = np.getNumber(0);
             float sy = sx;
-            if (np.mNumbers.size() > 1) {
-                sy = np.mNumbers.get(1);
+            if (np.size() > 1) {
+                sy = np.getNumber(1);
+            }
+            if (matrix == null) {
+                matrix = new Matrix();
             }
             matrix.postScale(sx, sy);
-
-            transformed = true;
         }
 
         np = readTransform(s, "skewX");
         if (np != null) {
-            float angle = np.mNumbers.get(0);
+            float angle = np.getNumber(0);
+            if (matrix == null) {
+                matrix = new Matrix();
+            }
             matrix.preSkew((float) Math.tan(angle), 0);
-
-            transformed = true;
         }
 
         np = readTransform(s, "skewY");
         if (np != null) {
-            float angle = np.mNumbers.get(0);
+            float angle = np.getNumber(0);
+            if (matrix == null) {
+                matrix = new Matrix();
+            }
             matrix.preSkew(0, (float) Math.tan(angle));
-
-            transformed = true;
         }
 
         np = readTransform(s, "rotate");
         if (np != null) {
-            float angle = np.mNumbers.get(0);
+            float angle = np.getNumber(0);
             float cx, cy;
-            if (np.mNumbers.size() > 2) {
-                cx = np.mNumbers.get(1);
-                cy = np.mNumbers.get(2);
+            if (matrix == null) {
+                matrix = new Matrix();
+            }
+            if (np.size() > 2) {
+                cx = np.getNumber(1);
+                cy = np.getNumber(2);
                 matrix.preRotate(angle, cx, cy);
             } else {
                 matrix.preRotate(angle);
             }
-            transformed = true;
         }
 
         np = readTransform(s, "translate");
         if (np != null) {
-            float tx = np.mNumbers.get(0);
+            float tx = np.getNumber(0);
             float ty = 0;
-            if (np.mNumbers.size() > 1) {
-                ty = np.mNumbers.get(1);
+            if (np.size() > 1) {
+                ty = np.getNumber(1);
+            }
+            if (matrix == null) {
+                matrix = new Matrix();
             }
             matrix.postTranslate(tx, ty);
-
-            transformed = true;
         }
 
-        return transformed ? matrix : null;
+        return matrix;
     }
 
     /**
@@ -1091,7 +1115,7 @@ public abstract class Sharp {
             if (unit != null) {
                 switch (unit) {
                     case PT:
-                        valueF = valueF * sDensity + 0.5f;
+                        valueF = valueF + 0.5f;
                         break;
                     case PERCENT:
                         valueF = valueF / 100f;
@@ -1161,6 +1185,10 @@ public abstract class Sharp {
 
         public float getNumber(int index) {
             return mNumbers.get(index);
+        }
+
+        public int size() {
+            return mNumbers.size();
         }
 
     }
@@ -1242,7 +1270,7 @@ public abstract class Sharp {
         }
 
         private Integer rgb(int r, int g, int b) {
-            return ((r & 0xff) << 16) | ((g & 0xff) << 8) | ((b & 0xff) << 0);
+            return ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
         }
 
         private int parseNum(String v) throws NumberFormatException {
@@ -1803,11 +1831,13 @@ public abstract class Sharp {
             boolean pushed = transform != null;
             mTransformStack.push(pushed);
             if (pushed) {
-                final Matrix matrix = parseTransform(transform);
                 mCanvas.save();
-                mCanvas.concat(matrix);
-                matrix.postConcat(mMatrixStack.peek());
-                mMatrixStack.push(matrix);
+                final Matrix matrix = parseTransform(transform);
+                if (matrix != null) {
+                    mCanvas.concat(matrix);
+                    matrix.postConcat(mMatrixStack.peek());
+                    mMatrixStack.push(matrix);
+                }
             }
         }
 
@@ -2341,33 +2371,29 @@ public abstract class Sharp {
                 Rect bounds = new Rect();
                 Paint paint = stroke == null ? fill : stroke;
                 paint.getTextBounds(text, 0, text.length(), bounds);
-                if (vAlign != BOTTOM) {
-                    //Log.d(TAG, "Adjusting y=" + y + " for boundaries=" + bounds);
-                    switch (vAlign) {
-                        case TOP:
-                            yOffset = bounds.height();
-                            break;
-                        case MIDDLE:
-                            yOffset = -bounds.centerY();
-                            break;
-                        case BOTTOM:
-                            // Default; no correction needed
-                            break;
-                    }
+                //Log.d(TAG, "Adjusting y=" + y + " for boundaries=" + bounds);
+                switch (vAlign) {
+                    case TOP:
+                        yOffset = bounds.height();
+                        break;
+                    case MIDDLE:
+                        yOffset = -bounds.centerY();
+                        break;
+                    case BOTTOM:
+                        // Default; no correction needed
+                        break;
                 }
                 float width = paint.measureText(text);
                 // Correct horizontal alignment
-                if (hAlign != LEFT) {
-                    switch (hAlign) {
-                        case LEFT:
-                            // Default; no correction needed
-                            break;
-                        case CENTER:
-                            xOffset = -width / 2f;
-                            break;
-                        case RIGHT:
-                            xOffset = -width;
-                    }
+                switch (hAlign) {
+                    case LEFT:
+                        // Default; no correction needed
+                        break;
+                    case CENTER:
+                        xOffset = -width / 2f;
+                        break;
+                    case RIGHT:
+                        xOffset = -width;
                 }
                 this.bounds.set(x, y, x + width, y + bounds.height());
 
