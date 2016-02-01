@@ -1144,26 +1144,36 @@ public abstract class Sharp {
         }
     }
 
-    private void onSvgStart(Canvas canvas, RectF bounds) {
+    private void onSvgStart(@NonNull Canvas canvas,
+                            @Nullable RectF bounds) {
         if (mOnElementListener != null) {
             mOnElementListener.onSvgStart(canvas, bounds);
         }
     }
 
-    private void onSvgEnd(Canvas canvas, RectF bounds) {
+    private void onSvgEnd(@NonNull Canvas canvas,
+                          @Nullable RectF bounds) {
         if (mOnElementListener != null) {
-            mOnElementListener.onSvgStart(canvas, bounds);
+            mOnElementListener.onSvgEnd(canvas, bounds);
         }
     }
 
-    private <T> T onSvgElement(String id, T element, RectF elementBounds, Canvas canvas, RectF canvasBounds, Paint paint) {
+    private <T> T onSvgElement(@Nullable String id,
+                               @NonNull T element,
+                               @Nullable RectF elementBounds,
+                               @NonNull Canvas canvas,
+                               @Nullable RectF canvasBounds,
+                               @Nullable Paint paint) {
         if (mOnElementListener != null) {
-            return mOnElementListener.onSvgElement(id, element, elementBounds, canvas, canvasBounds, paint);
+            return mOnElementListener.onSvgElement(
+                    id, element, elementBounds, canvas, canvasBounds, paint);
         }
         return element;
     }
 
-    private <T> void onSvgElementDrawn(String id, T element, Canvas canvas) {
+    private <T> void onSvgElementDrawn(@Nullable String id,
+                                       @NonNull T element,
+                                       @NonNull Canvas canvas) {
         if (mOnElementListener != null) {
             mOnElementListener.onSvgElementDrawn(id, element, canvas);
         }
