@@ -271,6 +271,8 @@ public abstract class Sharp {
         StringBuilder svgData = new StringBuilder();
         Scanner scanner = new Scanner(inputStream);
         String lineSeparator = System.getProperty("line.separator");
+        // Try-with-resources is only for API level 19 and up
+        //noinspection TryFinallyCanBeTryWithResources
         try {
             while (scanner.hasNextLine()) {
                 svgData.append(scanner.nextLine()).append(lineSeparator);
@@ -473,12 +475,16 @@ public abstract class Sharp {
     }
 
     private SharpPicture getSharpPicture(InputStream inputStream) throws SvgParseException {
+        if (inputStream == null) {
+            throw new NullPointerException("An InputStream must be provided");
+        }
         try {
             mSvgHandler.read(inputStream);
         } finally {
             try {
                 close(inputStream);
             } catch (IOException e) {
+                //noinspection ThrowFromFinallyBlock
                 throw new SvgParseException(e);
             }
         }
@@ -504,6 +510,7 @@ public abstract class Sharp {
                     close(inputStream);
                 }
             } catch (IOException e) {
+                //noinspection ThrowFromFinallyBlock
                 throw new SvgParseException(e);
             }
         }
@@ -525,6 +532,7 @@ public abstract class Sharp {
                             close(inputStream);
                         }
                     } catch (IOException e) {
+                        //noinspection ThrowFromFinallyBlock
                         throw new SvgParseException(e);
                     }
                 }
@@ -537,7 +545,7 @@ public abstract class Sharp {
         }.execute();
     }
 
-    private static NumberParse parseNumbers(String s) {
+    private static ArrayList<Float> parseNumbers(String s) {
         //Log.d(TAG, "Parsing numbers from: '" + s + "'");
         int n = s.length();
         int p = 0;
@@ -579,7 +587,7 @@ public abstract class Sharp {
                         numbers.add(f);
                     }
                     p = i;
-                    return new NumberParse(numbers, p);
+                    return numbers;
                 }
                 case 'e':
                 case 'E': {
@@ -621,16 +629,16 @@ public abstract class Sharp {
             }
             p = s.length();
         }
-        return new NumberParse(numbers, p);
+        return numbers;
     }
 
-    private static NumberParse readTransform(String attr, String type) {
+    private static ArrayList<Float> readTransform(String attr, String type) {
         int i = attr.indexOf(type + "(");
         if (i > -1) {
             i += type.length() + 1;
             int j = attr.indexOf(")", i);
             if (j > -1) {
-                NumberParse np = parseNumbers(attr.substring(i, j));
+                ArrayList<Float> np = parseNumbers(attr.substring(i, j));
                 if (np.size() > 0) {
                     return np;
                 }
@@ -644,20 +652,21 @@ public abstract class Sharp {
         Matrix matrix = null;
 
         if (s.startsWith("matrix(")) {
-            NumberParse np = parseNumbers(s.substring("matrix(".length()));
+            ArrayList<Float> np = parseNumbers(s.substring("matrix(".length()));
             if (np.size() == 6) {
+                //noinspection ConstantConditions
                 if (matrix == null) {
                     matrix = new Matrix();
                 }
                 matrix.setValues(new float[]{
                         // Row 1
-                        np.getNumber(0),
-                        np.getNumber(2),
-                        np.getNumber(4),
+                        np.get(0),
+                        np.get(2),
+                        np.get(4),
                         // Row 2
-                        np.getNumber(1),
-                        np.getNumber(3),
-                        np.getNumber(5),
+                        np.get(1),
+                        np.get(3),
+                        np.get(5),
                         // Row 3
                         0,
                         0,
@@ -666,12 +675,12 @@ public abstract class Sharp {
             }
         }
 
-        NumberParse np = readTransform(s, "scale");
+        ArrayList<Float> np = readTransform(s, "scale");
         if (np != null) {
-            float sx = np.getNumber(0);
+            float sx = np.get(0);
             float sy = sx;
             if (np.size() > 1) {
-                sy = np.getNumber(1);
+                sy = np.get(1);
             }
             if (matrix == null) {
                 matrix = new Matrix();
@@ -681,7 +690,7 @@ public abstract class Sharp {
 
         np = readTransform(s, "skewX");
         if (np != null) {
-            float angle = np.getNumber(0);
+            float angle = np.get(0);
             if (matrix == null) {
                 matrix = new Matrix();
             }
@@ -690,7 +699,7 @@ public abstract class Sharp {
 
         np = readTransform(s, "skewY");
         if (np != null) {
-            float angle = np.getNumber(0);
+            float angle = np.get(0);
             if (matrix == null) {
                 matrix = new Matrix();
             }
@@ -699,14 +708,14 @@ public abstract class Sharp {
 
         np = readTransform(s, "rotate");
         if (np != null) {
-            float angle = np.getNumber(0);
+            float angle = np.get(0);
             float cx, cy;
             if (matrix == null) {
                 matrix = new Matrix();
             }
             if (np.size() > 2) {
-                cx = np.getNumber(1);
-                cy = np.getNumber(2);
+                cx = np.get(1);
+                cy = np.get(2);
                 matrix.preRotate(angle, cx, cy);
             } else {
                 matrix.preRotate(angle);
@@ -715,10 +724,10 @@ public abstract class Sharp {
 
         np = readTransform(s, "translate");
         if (np != null) {
-            float tx = np.getNumber(0);
+            float tx = np.get(0);
             float ty = 0;
             if (np.size() > 1) {
-                ty = np.getNumber(1);
+                ty = np.get(1);
             }
             if (matrix == null) {
                 matrix = new Matrix();
@@ -750,7 +759,8 @@ public abstract class Sharp {
      *
      * @param s the path text from the XML
      */
-    private static Path doPath(String s) {
+    @NonNull
+    private static Path doPath(@NonNull String s) {
         int n = s.length();
         SvgParserHelper ph = new SvgParserHelper(s, 0);
         ph.skipWhitespace();
@@ -1072,8 +1082,8 @@ public abstract class Sharp {
         }
     }
 
-    private static NumberParse getNumberParseAttr(String name,
-                                                  Attributes attributes) {
+    private static ArrayList<Float> getNumberParseAttr(String name,
+                                                       Attributes attributes) {
         int n = attributes.getLength();
         for (int i = 0; i < n; i++) {
             if (attributes.getLocalName(i).equals(name)) {
@@ -1124,23 +1134,7 @@ public abstract class Sharp {
                 checkAssumedUnits(unit.mAbbreviation);
                 scaleFactor = unit.mScaleFactor;
             }
-            //Log.d(TAG, "Float parsing '" + name + "=" + value + "'");
             return valueF * scaleFactor;
-        }
-    }
-
-    private static Integer getHexAttr(String name, Attributes attributes) {
-        String v = getStringAttr(name, attributes);
-        //Log.d(TAG, "Hex parsing '" + name + "=" + v + "'");
-        if (v == null) {
-            return null;
-        } else {
-            try {
-                return Integer.parseInt(v.substring(1), 16);
-            } catch (NumberFormatException nfe) {
-                // todo - parse word-based color here
-                return null;
-            }
         }
     }
 
@@ -1177,30 +1171,6 @@ public abstract class Sharp {
         if (mOnElementListener != null) {
             mOnElementListener.onSvgElementDrawn(id, element, canvas);
         }
-    }
-
-    private static class NumberParse {
-
-        private ArrayList<Float> mNumbers;
-        private int mNextCmd;
-
-        public NumberParse(ArrayList<Float> numbers, int nextCmd) {
-            mNumbers = numbers;
-            mNextCmd = nextCmd;
-        }
-
-        public int getNextCmd() {
-            return mNextCmd;
-        }
-
-        public float getNumber(int index) {
-            return mNumbers.get(index);
-        }
-
-        public int size() {
-            return mNumbers.size();
-        }
-
     }
 
     private static class Gradient {
@@ -1301,7 +1271,7 @@ public abstract class Sharp {
                     int c = Integer.parseInt(v.substring(1), 16);
                     if (v.length() == 4) {
                         // short form color, i.e. #FFF
-                        c = (c & 0x0f) * 0x11 + (c & 0xf0) * 0x110 + (c & 0xf00) * 0x1100;
+                        c = hex3Tohex6(c);
                     }
                     return c;
                 } catch (NumberFormatException nfe) {
@@ -1389,14 +1359,29 @@ public abstract class Sharp {
             mSharp = sharp;
         }
 
+        /**
+         * @deprecated See notes in {@link #setWhiteMode(boolean)}.
+         */
+        @SuppressWarnings({"unused", "deprecation"})
+        @Deprecated
         public boolean isWhiteMode() {
             return mSharp.isWhiteMode();
         }
 
+        /**
+         * @deprecated See notes in {@link #addColorReplacement(int, int)}.
+         */
+        @SuppressWarnings({"unused", "deprecation"})
+        @Deprecated
         public int getReplacementColor(int color) {
             return mSharp.getReplacementColor(color);
         }
 
+        /**
+         * @deprecated See notes in {@link #addColorReplacement(String, int)}.
+         */
+        @SuppressWarnings({"unused", "deprecation"})
+        @Deprecated
         public int getColorForId(String id, int color) {
             return mSharp.getColorForId(id, color);
         }
@@ -2072,7 +2057,6 @@ public abstract class Sharp {
                 if (localName.equals("ellipse")) {
                     radiusX = getFloatAttr("rx", atts);
                     radiusY = getFloatAttr("ry", atts);
-
                 } else {
                     radiusX = radiusY = getFloatAttr("r", atts);
                 }
@@ -2099,10 +2083,9 @@ public abstract class Sharp {
                     popTransform();
                 }
             } else if (!hidden2 && (localName.equals("polygon") || localName.equals("polyline"))) {
-                NumberParse numbers = getNumberParseAttr("points", atts);
-                if (numbers != null) {
+                ArrayList<Float> points = getNumberParseAttr("points", atts);
+                if (points != null) {
                     Path p = new Path();
-                    ArrayList<Float> points = numbers.mNumbers;
                     if (points.size() > 1) {
                         pushTransform(atts);
                         Properties props = new Properties(atts);
