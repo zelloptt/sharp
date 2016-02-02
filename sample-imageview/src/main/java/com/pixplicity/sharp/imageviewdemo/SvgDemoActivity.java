@@ -29,32 +29,54 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import com.pixplicity.sharp.OnSvgElementListener;
 import com.pixplicity.sharp.Sharp;
+import com.pixplicity.sharp.SharpDrawable;
 import com.pixplicity.sharp.SharpPicture;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class SvgDemoActivity extends AppCompatActivity {
 
+    private static final String TAG = SvgDemoActivity.class.getSimpleName();
+
+    private static final boolean USE_CACHE = false;
+
     private ImageView mImageView;
     private Button mButton;
 
     private PhotoViewAttacher mAttacher;
     private Sharp mSvg;
+    private float mShadowRadius, mShadowDX, mShadowDY;
+    private int mShadowColor;
+
+    private final ArrayList<String> mShadowIdPrefixes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_svg_demo);
+
+        mShadowIdPrefixes.add("shirt");
+        mShadowIdPrefixes.add("hat");
+        mShadowIdPrefixes.add("pants");
+
+        mShadowRadius = 3.0f;
+        mShadowDX = 0;
+        mShadowDY = 1;
+        mShadowColor = Color.parseColor("#000000");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -77,7 +99,33 @@ public class SvgDemoActivity extends AppCompatActivity {
         });
 
         mAttacher = new PhotoViewAttacher(mImageView);
-        mAttacher.setMaximumScale(10f);
+        mAttacher.setMaximumScale(15f);
+
+        mAttacher.setOnMatrixChangeListener(new PhotoViewAttacher.OnMatrixChangedListener() {
+            @Override
+            public void onMatrixChanged(RectF rect) {
+                if (USE_CACHE) {
+                    String msg = rect.toString();
+                    Log.d(TAG, msg);
+                    Log.d(TAG, "scale=" + mAttacher.getScale());
+                }
+            }
+        });
+
+        mAttacher.setOnViewTapListener(new PhotoViewAttacher.OnViewTapListener() {
+            @Override
+            public void onViewTap(View view, float x, float y) {
+                if (USE_CACHE) {
+                    Drawable drawable = mImageView.getDrawable();
+                    if (drawable != null && drawable instanceof SharpDrawable) {
+                        // set the scale factor on the SharpDrawable
+                        ((SharpDrawable) drawable).setCacheScale(mAttacher.getScale());
+                        ((SharpDrawable) drawable).resetCache();
+                    }
+                    mImageView.invalidate();
+                }
+            }
+        });
 
         reloadSvg(false);
     }
@@ -86,25 +134,39 @@ public class SvgDemoActivity extends AppCompatActivity {
         mSvg.setOnElementListener(new OnSvgElementListener() {
 
             @Override
-            public void onSvgStart(Canvas canvas, RectF bounds) {
+            public void onSvgStart(@NonNull Canvas canvas,
+                                   @Nullable RectF bounds) {
             }
 
             @Override
-            public void onSvgEnd(Canvas canvas, RectF bounds) {
+            public void onSvgEnd(@NonNull Canvas canvas,
+                                 @Nullable RectF bounds) {
             }
 
             @Override
-            public <T> T onSvgElement(String id, T element, RectF elementBounds, Canvas canvas, RectF canvasBounds, Paint paint) {
-                if (changeColor && ("shirt".equals(id) || "hat".equals(id) || "pants".equals(id))) {
+            public <T> T onSvgElement(@Nullable String id,
+                                      @NonNull T element,
+                                      @Nullable RectF elementBounds,
+                                      @NonNull Canvas canvas,
+                                      @Nullable RectF canvasBounds,
+                                      @Nullable Paint paint) {
+                if (changeColor && paint != null && paint.getStyle() == Paint.Style.FILL && isPrefixIn(id, mShadowIdPrefixes)) {
                     Random random = new Random();
                     paint.setColor(Color.argb(255, random.nextInt(256),
                             random.nextInt(256), random.nextInt(256)));
+                    paint.setShadowLayer(mShadowRadius, mShadowDX, mShadowDY, mShadowColor);
                 }
                 return element;
             }
 
             @Override
-            public <T> void onSvgElementDrawn(String id, T element, Canvas canvas) {
+            public <T> void onSvgElementDrawn(@Nullable String id,
+                                              @NonNull T element,
+                                              @NonNull Canvas canvas,
+                                              @Nullable Paint paint) {
+                if (paint != null) {
+                    paint.setShadowLayer(0, 0, 0, 0);
+                }
             }
 
         });
@@ -112,7 +174,10 @@ public class SvgDemoActivity extends AppCompatActivity {
             @Override
             public void onPictureReady(SharpPicture picture) {
                 {
-                    Drawable drawable = picture.getDrawable(mImageView);
+                    SharpDrawable drawable = picture.getDrawable(mImageView);
+                    if (USE_CACHE) {
+                        drawable.setCaching(true);
+                    }
                     mImageView.setImageDrawable(drawable);
                 }
 
@@ -129,6 +194,17 @@ public class SvgDemoActivity extends AppCompatActivity {
                 mAttacher.update();
             }
         });
+    }
+
+    private boolean isPrefixIn(String id, ArrayList<String> prefixList) {
+        if (id != null) {
+            for (String prefix : prefixList) {
+                if (id.startsWith(prefix)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }
