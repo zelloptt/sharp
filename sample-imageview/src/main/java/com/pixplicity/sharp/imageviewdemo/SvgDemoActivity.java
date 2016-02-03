@@ -62,9 +62,12 @@ public class SvgDemoActivity extends AppCompatActivity {
         mImageView = (ImageView) findViewById(R.id.iv_image);
         mButton = (Button) findViewById(R.id.bt_button);
 
-        mSvg = Sharp.loadResource(getResources(), R.drawable.cartman);
+        mSvg = Sharp.loadResource(getResources(), R.raw.cartman);
         // If you want to load typefaces from assets:
         //          .withAssets(getAssets());
+
+        // If you want to load an SVG from assets:
+        //mSvg = Sharp.loadAsset(getAssets(), "cartman.svg");
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override

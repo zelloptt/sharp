@@ -5,11 +5,34 @@ import android.content.res.Resources;
 
 import com.pixplicity.sharp.Sharp;
 import com.pixplicity.sharp.SharpPicture;
+import com.pixplicity.sharp.SvgParseException;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 
-import static com.larvalabs.androidify.wallpaper.Constants.*;
+import static com.larvalabs.androidify.wallpaper.Constants.HAIR_COLORS;
+import static com.larvalabs.androidify.wallpaper.Constants.MAX_HEAD_RATIO;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_ARMS_MAX_X;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_ARMS_MAX_Y;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_ARMS_MIN_X;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_ARMS_MIN_Y;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_BODY_MAX_X;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_BODY_MAX_Y;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_BODY_MIN_X;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_BODY_MIN_Y;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_HEAD_MAX_X;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_HEAD_MAX_Y;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_HEAD_MIN_X;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_HEAD_MIN_Y;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_LEGS_MAX_X;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_LEGS_MAX_Y;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_LEGS_MIN_X;
+import static com.larvalabs.androidify.wallpaper.Constants.RESIZE_LEGS_MIN_Y;
+import static com.larvalabs.androidify.wallpaper.Constants.SKIN_COLORS;
 
 /**
  * Responsible for maintaining the list of available assets (clothes, hair, etc.), as well as loading the
@@ -191,8 +214,7 @@ public class AssetDatabase {
                 sharp.addColorReplacement(searchColor, replaceColor);
             }
             return sharp.getSharpPicture();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SvgParseException e) {
             return null;
         }
     }

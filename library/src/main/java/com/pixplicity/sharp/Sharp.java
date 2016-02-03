@@ -506,7 +506,9 @@ public abstract class Sharp {
             throw new SvgParseException(e);
         } finally {
             try {
-                close(inputStream);
+                if (inputStream != null) {
+                    close(inputStream);
+                }
             } catch (IOException e) {
                 //noinspection ThrowFromFinallyBlock
                 throw new SvgParseException(e);
