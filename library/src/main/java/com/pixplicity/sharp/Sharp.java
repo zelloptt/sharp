@@ -1167,6 +1167,7 @@ public abstract class Sharp {
         }
     }
 
+    @Nullable
     private <T> T onSvgElement(@Nullable String id,
                                @NonNull T element,
                                @Nullable RectF elementBounds,
@@ -1410,6 +1411,7 @@ public abstract class Sharp {
             mSharp.onSvgEnd(mCanvas, mBounds);
         }
 
+        @Nullable
         private <T> T onSvgElement(@Nullable String id,
                                    @NonNull T element,
                                    @Nullable RectF elementBounds,

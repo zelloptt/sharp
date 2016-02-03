@@ -32,12 +32,35 @@ import android.support.annotation.Nullable;
 @SuppressWarnings("unused")
 public interface OnSvgElementListener {
 
+    /**
+     * Called when reading of the SVG starts.
+     * @param canvas Canvas onto which the element is drawn
+     * @param bounds Bounds of the canvas in {@link RectF}
+     */
     void onSvgStart(@NonNull Canvas canvas,
                     @Nullable RectF bounds);
 
+    /**
+     * Called when reading of the SVG ends.
+     * @param canvas Canvas onto which the element is drawn
+     * @param bounds Bounds of the canvas in {@link RectF}
+     */
     void onSvgEnd(@NonNull Canvas canvas,
                   @Nullable RectF bounds);
 
+    /**
+     * Called when an SVG element is encountered. Take care to return the element if you wish for it
+     * to be drawn.
+     * <p>Note that this method may be called twice if an element has both a fill and a stroke.</p>
+     * @param id ID of the element
+     * @param element Element itself
+     * @param elementBounds Bounds of the element in {@link RectF}
+     * @param canvas Canvas onto which the element is drawn
+     * @param canvasBounds Bounds of the canvas in {@link RectF}
+     * @param paint Paint to be applied to this element
+     * @return This method should return the element; return {@code null} if it should not be drawn.
+     */
+    @Nullable
     <T> T onSvgElement(@Nullable String id,
                        @NonNull T element,
                        @Nullable RectF elementBounds,
@@ -45,6 +68,13 @@ public interface OnSvgElementListener {
                        @Nullable RectF canvasBounds,
                        @Nullable Paint paint);
 
+    /**
+     * Called when an SVG element has been drawn.
+     * @param id ID of the element
+     * @param element Element itself
+     * @param canvas Canvas onto which the element is drawn
+     * @param paint Paint to be applied to this element
+     */
     <T> void onSvgElementDrawn(@Nullable String id,
                                @NonNull T element,
                                @NonNull Canvas canvas,
