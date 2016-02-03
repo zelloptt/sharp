@@ -1138,21 +1138,6 @@ public abstract class Sharp {
         }
     }
 
-    private static Integer getHexAttr(String name, Attributes attributes) {
-        String v = getStringAttr(name, attributes);
-        //Log.d(TAG, "Hex parsing '" + name + "=" + v + "'");
-        if (v == null) {
-            return null;
-        } else {
-            try {
-                return Integer.parseInt(v.substring(1), 16);
-            } catch (NumberFormatException nfe) {
-                // todo - parse word-based color here
-                return null;
-            }
-        }
-    }
-
     private void onSvgStart(@NonNull Canvas canvas,
                             @Nullable RectF bounds) {
         if (mOnElementListener != null) {
