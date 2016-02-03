@@ -29,6 +29,8 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -86,15 +88,22 @@ public class SvgDemoActivity extends AppCompatActivity {
         mSvg.setOnElementListener(new OnSvgElementListener() {
 
             @Override
-            public void onSvgStart(Canvas canvas, RectF bounds) {
+            public void onSvgStart(@NonNull Canvas canvas,
+                                   @Nullable RectF bounds) {
             }
 
             @Override
-            public void onSvgEnd(Canvas canvas, RectF bounds) {
+            public void onSvgEnd(@NonNull Canvas canvas,
+                                 @Nullable RectF bounds) {
             }
 
             @Override
-            public <T> T onSvgElement(String id, T element, RectF elementBounds, Canvas canvas, RectF canvasBounds, Paint paint) {
+            public <T> T onSvgElement(@Nullable String id,
+                                      @NonNull T element,
+                                      @Nullable RectF elementBounds,
+                                      @NonNull Canvas canvas,
+                                      @Nullable RectF canvasBounds,
+                                      @Nullable Paint paint) {
                 if (changeColor && paint != null && paint.getStyle() == Paint.Style.FILL &&
                         ("shirt".equals(id) || "hat".equals(id) || "pants".equals(id))) {
                     Random random = new Random();
@@ -105,7 +114,10 @@ public class SvgDemoActivity extends AppCompatActivity {
             }
 
             @Override
-            public <T> void onSvgElementDrawn(String id, T element, Canvas canvas, Paint paint) {
+            public <T> void onSvgElementDrawn(@Nullable String id,
+                                              @NonNull T element,
+                                              @NonNull Canvas canvas,
+                                              @Nullable Paint paint) {
             }
 
         });
