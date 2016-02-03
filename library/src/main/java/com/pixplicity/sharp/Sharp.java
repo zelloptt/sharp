@@ -1152,6 +1152,7 @@ public abstract class Sharp {
         }
     }
 
+    @Nullable
     private <T> T onSvgElement(@Nullable String id,
                                @NonNull T element,
                                @Nullable RectF elementBounds,
@@ -1395,6 +1396,7 @@ public abstract class Sharp {
             mSharp.onSvgEnd(mCanvas, mBounds);
         }
 
+        @Nullable
         private <T> T onSvgElement(@Nullable String id,
                                    @NonNull T element,
                                    @Nullable RectF elementBounds,
@@ -2025,16 +2027,16 @@ public abstract class Sharp {
                     if (mRect != null) {
                         mCanvas.drawRoundRect(mRect, rx, ry, mFillPaint);
                         onSvgElementDrawn(id, mRect, mFillPaint);
+                        doLimits(mRect);
                     }
-                    doLimits(mRect);
                 }
                 if (doStroke(props, mRect)) {
                     mRect = onSvgElement(id, mRect, mRect, mStrokePaint);
                     if (mRect != null) {
                         mCanvas.drawRoundRect(mRect, rx, ry, mStrokePaint);
                         onSvgElementDrawn(id, mRect, mStrokePaint);
+                        doLimits(mRect, mStrokePaint);
                     }
-                    doLimits(mRect, mStrokePaint);
                 }
                 popTransform();
             } else if (!hidden2 && localName.equals("line")) {
@@ -2051,8 +2053,8 @@ public abstract class Sharp {
                     if (mLine != null) {
                         mCanvas.drawLine(mLine.left, mLine.top, mLine.right, mLine.bottom, mStrokePaint);
                         onSvgElementDrawn(id, mLine, mStrokePaint);
+                        doLimits(mRect, mStrokePaint);
                     }
-                    doLimits(mRect, mStrokePaint);
                     popTransform();
                 }
             } else if (!hidden2 && (localName.equals("circle") || localName.equals("ellipse"))) {
@@ -2075,16 +2077,16 @@ public abstract class Sharp {
                         if (mRect != null) {
                             mCanvas.drawOval(mRect, mFillPaint);
                             onSvgElementDrawn(id, mRect, mFillPaint);
+                            doLimits(mRect);
                         }
-                        doLimits(mRect);
                     }
                     if (doStroke(props, mRect)) {
                         mRect = onSvgElement(id, mRect, mRect, mStrokePaint);
                         if (mRect != null) {
                             mCanvas.drawOval(mRect, mStrokePaint);
                             onSvgElementDrawn(id, mRect, mStrokePaint);
+                            doLimits(mRect, mStrokePaint);
                         }
-                        doLimits(mRect, mStrokePaint);
                     }
                     popTransform();
                 }
@@ -2111,16 +2113,16 @@ public abstract class Sharp {
                             if (p != null) {
                                 mCanvas.drawPath(p, mFillPaint);
                                 onSvgElementDrawn(id, p, mFillPaint);
+                                doLimits(mRect);
                             }
-                            doLimits(mRect);
                         }
                         if (doStroke(props, mRect)) {
                             p = onSvgElement(id, p, mRect, mStrokePaint);
                             if (p != null) {
                                 mCanvas.drawPath(p, mStrokePaint);
                                 onSvgElementDrawn(id, p, mStrokePaint);
+                                doLimits(mRect, mStrokePaint);
                             }
-                            doLimits(mRect, mStrokePaint);
                         }
                         popTransform();
                     }
@@ -2152,16 +2154,16 @@ public abstract class Sharp {
                     if (p != null) {
                         mCanvas.drawPath(p, mFillPaint);
                         onSvgElementDrawn(id, p, mFillPaint);
+                        doLimits(mRect);
                     }
-                    doLimits(mRect);
                 }
-                if (doStroke(props, mRect)) {
+                if (p != null && doStroke(props, mRect)) {
                     p = onSvgElement(id, p, mRect, mStrokePaint);
                     if (p != null) {
                         mCanvas.drawPath(p, mStrokePaint);
                         onSvgElementDrawn(id, p, mStrokePaint);
+                        doLimits(mRect, mStrokePaint);
                     }
-                    doLimits(mRect, mStrokePaint);
                 }
                 popTransform();
             } else if (!hidden2 && localName.equals("text")) {
