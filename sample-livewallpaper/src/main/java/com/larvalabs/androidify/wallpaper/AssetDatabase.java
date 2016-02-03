@@ -191,9 +191,6 @@ public class AssetDatabase {
                 sharp.addColorReplacement(searchColor, replaceColor);
             }
             return sharp.getSharpPicture();
-        } catch (IOException fne) {
-            // ignore, requested file is just not present or valid
-            return null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;

@@ -62,10 +62,9 @@ public class SvgDemoActivity extends AppCompatActivity {
         mImageView = (ImageView) findViewById(R.id.iv_image);
         mButton = (Button) findViewById(R.id.bt_button);
 
-        //mSvg = Sharp.loadResource(getResources(), R.drawable.cartman);
+        mSvg = Sharp.loadResource(getResources(), R.drawable.cartman);
         // If you want to load typefaces from assets:
         //          .withAssets(getAssets());
-        mSvg = Sharp.loadAsset(getAssets(), "blueprint.svg");
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,7 +92,8 @@ public class SvgDemoActivity extends AppCompatActivity {
 
             @Override
             public <T> T onSvgElement(String id, T element, RectF elementBounds, Canvas canvas, RectF canvasBounds, Paint paint) {
-                if (changeColor && ("shirt".equals(id) || "hat".equals(id) || "pants".equals(id))) {
+                if (changeColor && paint != null && paint.getStyle() == Paint.Style.FILL &&
+                        ("shirt".equals(id) || "hat".equals(id) || "pants".equals(id))) {
                     Random random = new Random();
                     paint.setColor(Color.argb(255, random.nextInt(256),
                             random.nextInt(256), random.nextInt(256)));
@@ -102,7 +102,7 @@ public class SvgDemoActivity extends AppCompatActivity {
             }
 
             @Override
-            public <T> void onSvgElementDrawn(String id, T element, Canvas canvas) {
+            public <T> void onSvgElementDrawn(String id, T element, Canvas canvas, Paint paint) {
             }
 
         });

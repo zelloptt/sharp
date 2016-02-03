@@ -26,16 +26,28 @@ package com.pixplicity.sharp;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 @SuppressWarnings("unused")
 public interface OnSvgElementListener {
 
-    void onSvgStart(Canvas canvas, RectF bounds);
+    void onSvgStart(@NonNull Canvas canvas,
+                    @Nullable RectF bounds);
 
-    void onSvgEnd(Canvas canvas, RectF bounds);
+    void onSvgEnd(@NonNull Canvas canvas,
+                  @Nullable RectF bounds);
 
-    <T> T onSvgElement(String id, T element, RectF elementBounds, Canvas canvas, RectF canvasBounds, Paint paint);
+    <T> T onSvgElement(@Nullable String id,
+                       @NonNull T element,
+                       @Nullable RectF elementBounds,
+                       @NonNull Canvas canvas,
+                       @Nullable RectF canvasBounds,
+                       @Nullable Paint paint);
 
-    <T> void onSvgElementDrawn(String id, T element, Canvas canvas);
+    <T> void onSvgElementDrawn(@Nullable String id,
+                               @NonNull T element,
+                               @NonNull Canvas canvas,
+                               @Nullable Paint paint);
 
 }
