@@ -89,7 +89,7 @@ public class SvgDemoActivity extends AppCompatActivity {
         //          .withAssets(getAssets());
 
         // If you want to load an SVG from assets:
-        //mSvg = Sharp.loadAsset(getAssets(), "blueprint.svg");
+        //mSvg = Sharp.loadAsset(getAssets(), "cartman.svg");
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
