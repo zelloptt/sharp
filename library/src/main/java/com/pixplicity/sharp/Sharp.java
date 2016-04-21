@@ -1447,9 +1447,9 @@ public abstract class Sharp {
                     sTextDynamic.clear();
                     sTextDynamic = null;
                 }
-                Log.d(TAG, "Parsing complete in " + (System.currentTimeMillis() - start) + " ms.");
+                Log.v(TAG, "Parsing complete in " + (System.currentTimeMillis() - start) + " ms.");
             } catch (IOException | SAXException | ParserConfigurationException e) {
-                Log.e(TAG, "failed parsing SVG", e);
+                Log.e(TAG, "Failed parsing SVG", e);
                 throw new SvgParseException(e);
             }
         }
@@ -1724,7 +1724,7 @@ public abstract class Sharp {
                     positions[i] = gradient.mPositions.get(i);
                 }
                 if (colors.length == 0) {
-                    Log.w(TAG, "bad gradient, id=" + gradient.mId);
+                    Log.d(TAG, "bad gradient, id=" + gradient.mId);
                 }
                 if (gradient.mIsLinear) {
                     gradient.mShader = new LinearGradient(gradient.mX1, gradient.mY1, gradient.mX2, gradient.mY2, colors, positions, gradient.mTileMode);
@@ -1923,7 +1923,7 @@ public abstract class Sharp {
                 if (width < 0 || height < 0) {
                     width = 100;
                     height = 100;
-                    Log.w(TAG, "element '" + localName + "' does not provide its dimensions; using " + width + "x" + height);
+                    Log.d(TAG, "element '" + localName + "' does not provide its dimensions; using " + width + "x" + height);
                 }
                 mBounds = new RectF(0, 0, width, height);
                 //Log.d(TAG, "svg boundaries: " + mBounds);
@@ -2191,7 +2191,7 @@ public abstract class Sharp {
                         mReadIgnoreStack.push(localName);
                         break;
                     default:
-                        Log.d(TAG, "Unrecognized SVG command: " + localName);
+                        Log.w(TAG, "Unrecognized SVG command: " + localName);
                         break;
                 }
             }
@@ -2537,12 +2537,12 @@ public abstract class Sharp {
                                 }
                             }
                         } catch (IOException e1) {
-                            Log.w(TAG, "Failed listing assets directory for /fonts", e);
+                            Log.e(TAG, "Failed listing assets directory for /fonts", e);
                         }
                         if (!found) {
-                            Log.w(TAG, "Typeface is missing from assets: " + typefaceFile);
+                            Log.e(TAG, "Typeface is missing from assets: " + typefaceFile);
                         } else {
-                            Log.w(TAG, "Failed to create typeface from assets: " + typefaceFile, e);
+                            Log.e(TAG, "Failed to create typeface from assets: " + typefaceFile, e);
                         }
                         plain = null;
                     }
@@ -2551,7 +2551,7 @@ public abstract class Sharp {
                         return Typeface.create(plain, styleParam);
                     }
                 } else {
-                    Log.w(TAG, "Typefaces can only be loaded if assets are provided; " +
+                    Log.e(TAG, "Typefaces can only be loaded if assets are provided; " +
                             "invoke " + Sharp.class.getSimpleName() + " with .withAssets()");
                 }
             }
