@@ -1724,7 +1724,7 @@ public abstract class Sharp {
                     positions[i] = gradient.mPositions.get(i);
                 }
                 if (colors.length == 0) {
-                    Log.d(TAG, "bad gradient, id=" + gradient.mId);
+                    Log.w(TAG, "bad gradient, id=" + gradient.mId);
                 }
                 if (gradient.mIsLinear) {
                     gradient.mShader = new LinearGradient(gradient.mX1, gradient.mY1, gradient.mX2, gradient.mY2, colors, positions, gradient.mTileMode);
@@ -1923,7 +1923,7 @@ public abstract class Sharp {
                 if (width < 0 || height < 0) {
                     width = 100;
                     height = 100;
-                    Log.d(TAG, "element '" + localName + "' does not provide its dimensions; using " + width + "x" + height);
+                    Log.w(TAG, "element '" + localName + "' does not provide its dimensions; using " + width + "x" + height);
                 }
                 mBounds = new RectF(0, 0, width, height);
                 //Log.d(TAG, "svg boundaries: " + mBounds);
