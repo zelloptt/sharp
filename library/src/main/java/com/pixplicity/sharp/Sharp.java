@@ -28,7 +28,6 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.DashPathEffect;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -44,7 +43,6 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Looper;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
@@ -68,7 +66,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Stack;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -98,11 +95,6 @@ public abstract class Sharp {
     private static HashMap<String, String> sTextDynamic = null;
 
     private final SvgHandler mSvgHandler;
-
-    private HashMap<Integer, Integer> mReplaceByColor = null;
-    private HashMap<String, Integer> mReplaceById = null;
-
-    private boolean mWhiteMode = false;
 
     private OnSvgElementListener mOnElementListener;
     private AssetManager mAssetManager;
@@ -300,101 +292,6 @@ public abstract class Sharp {
         return this;
     }
 
-    /**
-     * @deprecated See notes in {@link #addColorReplacement(int, int)}.
-     */
-    @SuppressWarnings("unused")
-    @Deprecated
-    public Sharp setColorReplacement(HashMap<String, Integer> idToColor) {
-        mReplaceById = idToColor;
-        return this;
-    }
-
-    /**
-     * Replaces any element with a specific ID with a replacement color.
-     *
-     * @param id           element ID to perform replacement on
-     * @param replaceColor {@link Color} to use for element
-     * @return this Sharp object
-     * @deprecated This method will be removed in a future release. It's recommended to register an
-     * {@link OnSvgElementListener} to modify the paint.
-     */
-    @SuppressWarnings("unused")
-    public Sharp addColorReplacement(String id, @ColorInt int replaceColor) {
-        if (mReplaceById == null) {
-            mReplaceById = new HashMap<>();
-        }
-        mReplaceById.put(id, replaceColor);
-        return this;
-    }
-
-    /**
-     * @deprecated See notes in {@link #addColorReplacement(String, int)}.
-     */
-    @SuppressWarnings("unused")
-    @Deprecated
-    public int getColorForId(String id, @ColorInt int color) {
-        if (mReplaceById != null) {
-            if (id.length() != 0 && mReplaceById.containsKey(id)) {
-                color = mReplaceById.get(id);
-            }
-        }
-        return color;
-    }
-
-    /**
-     * Replaces any search color with a replacement color.
-     *
-     * @param searchColor  color to match
-     * @param replaceColor replacement color
-     * @return this Sharp object
-     * @deprecated This method will be removed in a future release. It's recommended to register an
-     * {@link OnSvgElementListener} to modify the paint.
-     */
-    @SuppressWarnings("unused")
-    @Deprecated
-    public Sharp addColorReplacement(@ColorInt int searchColor, @ColorInt int replaceColor) {
-        if (mReplaceByColor == null) {
-            mReplaceByColor = new HashMap<>();
-        }
-        mReplaceByColor.put(searchColor, replaceColor);
-        return this;
-    }
-
-    /**
-     * @deprecated See notes in {@link #addColorReplacement(int, int)}.
-     */
-    @SuppressWarnings("unused")
-    @Deprecated
-    public int getReplacementColor(@ColorInt int color) {
-        if (mReplaceByColor != null && mReplaceByColor.containsKey(color)) {
-            return mReplaceByColor.get(color);
-        }
-        return color;
-    }
-
-    /**
-     * Sets all stroke and fill colors to white.
-     *
-     * @deprecated This method will be removed in a future release. It's recommended to register an
-     * {@link OnSvgElementListener} to modify the paint.
-     */
-    @SuppressWarnings("unused")
-    @Deprecated
-    public Sharp setWhiteMode(boolean whiteMode) {
-        mWhiteMode = whiteMode;
-        return this;
-    }
-
-    /**
-     * @deprecated See notes in {@link #setWhiteMode(boolean)}.
-     */
-    @SuppressWarnings("unused")
-    @Deprecated
-    public boolean isWhiteMode() {
-        return mWhiteMode;
-    }
-
     protected abstract InputStream getInputStream() throws IOException;
 
     protected abstract void close(InputStream inputStream) throws IOException;
@@ -426,7 +323,7 @@ public abstract class Sharp {
         }
     }
 
-    @SuppressWarnings("unused, deprecation")
+    @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void intoBackground(final View view) {
         final SharpDrawable drawable = getDrawable(view);
@@ -586,7 +483,6 @@ public abstract class Sharp {
                         Float f = Float.parseFloat(str);
                         numbers.add(f);
                     }
-                    p = i;
                     return numbers;
                 }
                 case 'e':
@@ -627,7 +523,6 @@ public abstract class Sharp {
             } catch (NumberFormatException nfe) {
                 // Just white-space, forget it
             }
-            p = s.length();
         }
         return numbers;
     }
@@ -997,8 +892,8 @@ public abstract class Sharp {
         return p;
     }
 
-    private static float angle(float x1, float y1, float x2, float y2) {
-        return (float) Math.toDegrees(Math.atan2(x1, y1) - Math.atan2(x2, y2)) % 360;
+    private static float angle(float y1, float x1, float y2, float x2) {
+        return (float) Math.toDegrees(Math.atan2(y1, x1) - Math.atan2(y2, x2)) % 360;
     }
 
     private static final RectF arcRectf = new RectF();
@@ -1135,21 +1030,6 @@ public abstract class Sharp {
                 scaleFactor = unit.mScaleFactor;
             }
             return valueF * scaleFactor;
-        }
-    }
-
-    private static Integer getHexAttr(String name, Attributes attributes) {
-        String v = getStringAttr(name, attributes);
-        //Log.d(TAG, "Hex parsing '" + name + "=" + v + "'");
-        if (v == null) {
-            return null;
-        } else {
-            try {
-                return Integer.parseInt(v.substring(1), 16);
-            } catch (NumberFormatException nfe) {
-                // todo - parse word-based color here
-                return null;
-            }
         }
     }
 
@@ -1353,7 +1233,7 @@ public abstract class Sharp {
         private Stack<Boolean> mFillSetStack = new Stack<>();
 
         // Scratch rect (so we aren't constantly making new ones)
-        private Line mLine = new Line();
+        private RectF mLine = new RectF();
         private RectF mRect = new RectF();
         private RectF mBounds = null;
         private RectF mLimits = new RectF(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
@@ -1373,33 +1253,6 @@ public abstract class Sharp {
 
         private SvgHandler(Sharp sharp) {
             mSharp = sharp;
-        }
-
-        /**
-         * @deprecated See notes in {@link #setWhiteMode(boolean)}.
-         */
-        @SuppressWarnings({"unused", "deprecation"})
-        @Deprecated
-        public boolean isWhiteMode() {
-            return mSharp.isWhiteMode();
-        }
-
-        /**
-         * @deprecated See notes in {@link #addColorReplacement(int, int)}.
-         */
-        @SuppressWarnings({"unused", "deprecation"})
-        @Deprecated
-        public int getReplacementColor(int color) {
-            return mSharp.getReplacementColor(color);
-        }
-
-        /**
-         * @deprecated See notes in {@link #addColorReplacement(String, int)}.
-         */
-        @SuppressWarnings({"unused", "deprecation"})
-        @Deprecated
-        public int getColorForId(String id, int color) {
-            return mSharp.getColorForId(id, color);
         }
 
         private void onSvgStart() {
@@ -1480,11 +1333,6 @@ public abstract class Sharp {
         private boolean doFill(Properties atts, RectF boundingBox) {
             if ("none".equals(atts.getString("display"))) {
                 return false;
-            }
-            if (isWhiteMode()) {
-                mFillPaint.setShader(null);
-                mFillPaint.setColor(Color.WHITE);
-                return true;
             }
             String fillString = atts.getString("fill");
             if (fillString != null) {
@@ -1569,10 +1417,6 @@ public abstract class Sharp {
         }
 
         private boolean doStroke(Properties atts, RectF boundingBox) {
-            if (isWhiteMode()) {
-                // Never stroke in white mode
-                return false;
-            }
             if ("none".equals(atts.getString("display"))) {
                 return false;
             }
@@ -1737,9 +1581,6 @@ public abstract class Sharp {
 
         private void doColor(Properties atts, Integer color, boolean fillMode, Paint paint) {
             int c = (0xFFFFFF & color) | 0xFF000000;
-            String id = atts.getString("id");
-            c = getReplacementColor(c);
-            c = getColorForId(id, c);
             paint.setShader(null);
             paint.setColor(c);
             Float opacity = atts.getFloat("opacity");
@@ -1754,59 +1595,6 @@ public abstract class Sharp {
             } else {
                 paint.setAlpha((int) (255 * opacity));
             }
-        }
-
-        /**
-         * set the path style (if any)
-         * stroke-dasharray="n1,n2,..."
-         * stroke-dashoffset=n
-         */
-        private void pathStyleHelper(String style, String offset) {
-            if (style == null) {
-                return;
-            }
-
-            if (style.equals("none")) {
-                mStrokePaint.setPathEffect(null);
-                return;
-            }
-
-            StringTokenizer st = new StringTokenizer(style, " ,");
-            int count = st.countTokens();
-            float[] intervals = new float[(count & 1) == 1 ? count * 2 : count];
-            float max = 0;
-            float current = 1f;
-            int i = 0;
-            while (st.hasMoreTokens()) {
-                intervals[i++] = current = toFloat(st.nextToken(), current);
-                max += current;
-            }
-
-            // in svg speak, we double the intervals on an odd count
-            for (int start = 0; i < intervals.length; i++, start++) {
-                max += intervals[i] = intervals[start];
-            }
-
-            float off = 0f;
-            if (offset != null) {
-                try {
-                    off = Float.parseFloat(offset) % max;
-                } catch (NumberFormatException e) {
-                    // ignore
-                }
-            }
-
-            mStrokePaint.setPathEffect(new DashPathEffect(intervals, off));
-        }
-
-        private static float toFloat(String s, float dflt) {
-            float result = dflt;
-            try {
-                result = Float.parseFloat(s);
-            } catch (NumberFormatException e) {
-                // ignore
-            }
-            return result;
         }
 
         private boolean hidden = false;
@@ -1892,13 +1680,8 @@ public abstract class Sharp {
                 }
                 return;
             }
-            boolean forcedToHide = false;
-            if (id != null && getColorForId(id, -1) == Color.TRANSPARENT) {
-                forcedToHide = true;
-            }
-            boolean hidden2 = hidden || forcedToHide;
 
-            if (!hidden2 && localName.equals("use")) {
+            if (!hidden && localName.equals("use")) {
                 localName = "path";
             }
 
@@ -1960,7 +1743,7 @@ public abstract class Sharp {
                     //Log.d(TAG, "Hidden up: " + hiddenLevel);
                 }
                 // Go in to hidden mode if display is "none"
-                if ("none".equals(props.getString("display")) || forcedToHide) {
+                if ("none".equals(props.getString("display"))) {
                     if (!hidden) {
                         hidden = true;
                         hiddenLevel = 1;
@@ -2006,7 +1789,7 @@ public abstract class Sharp {
                 mGroupStack.push(group);
                 // FIXME compute bounds before drawing?
                 onSvgElement(id, group, null, null);
-            } else if (!hidden2 && localName.equals("rect")) {
+            } else if (!hidden && localName.equals("rect")) {
                 Float x = getFloatAttr("x", atts, 0f);
                 Float y = getFloatAttr("y", atts, 0f);
 
@@ -2052,7 +1835,7 @@ public abstract class Sharp {
                     doLimits(mRect, mStrokePaint);
                 }
                 popTransform();
-            } else if (!hidden2 && localName.equals("line")) {
+            } else if (!hidden && localName.equals("line")) {
                 Float x1 = getFloatAttr("x1", atts);
                 Float x2 = getFloatAttr("x2", atts);
                 Float y1 = getFloatAttr("y1", atts);
@@ -2070,7 +1853,7 @@ public abstract class Sharp {
                     doLimits(mRect, mStrokePaint);
                     popTransform();
                 }
-            } else if (!hidden2 && (localName.equals("circle") || localName.equals("ellipse"))) {
+            } else if (!hidden && (localName.equals("circle") || localName.equals("ellipse"))) {
                 Float centerX, centerY, radiusX, radiusY;
 
                 centerX = getFloatAttr("cx", atts);
@@ -2103,7 +1886,7 @@ public abstract class Sharp {
                     }
                     popTransform();
                 }
-            } else if (!hidden2 && (localName.equals("polygon") || localName.equals("polyline"))) {
+            } else if (!hidden && (localName.equals("polygon") || localName.equals("polyline"))) {
                 ArrayList<Float> points = getNumberParseAttr("points", atts);
                 if (points != null) {
                     Path p = new Path();
@@ -2140,7 +1923,7 @@ public abstract class Sharp {
                         popTransform();
                     }
                 }
-            } else if (!hidden2 && localName.equals("path")) {
+            } else if (!hidden && localName.equals("path")) {
                 String d = getStringAttr("d", atts);
 
                 if (mReadingDefs) {
@@ -2179,12 +1962,12 @@ public abstract class Sharp {
                     doLimits(mRect, mStrokePaint);
                 }
                 popTransform();
-            } else if (!hidden2 && localName.equals("text")) {
+            } else if (!hidden && localName.equals("text")) {
                 pushTransform(atts);
                 mTextStack.push(new SvgText(atts, mTextStack.isEmpty() ? null : mTextStack.peek()));
-            } else if (!hidden2 && localName.equals("tspan")) {
+            } else if (!hidden && localName.equals("tspan")) {
                 mTextStack.push(new SvgText(atts, mTextStack.isEmpty() ? null : mTextStack.peek()));
-            } else if (!hidden2) {
+            } else if (!hidden) {
                 switch (localName) {
                     case "metadata":
                         // Ignore, including children
