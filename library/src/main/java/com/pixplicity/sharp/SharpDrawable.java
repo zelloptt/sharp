@@ -148,16 +148,19 @@ public class SharpDrawable extends PictureDrawable {
      * automatically redrawn, as the way in which the SharpDrawable is drawn may change without it
      * being informed. To manually redraw the cache, invoke {@link #resetCache()}.
      *
-     * @param caching
+     * @param caching boolean
      */
+    @SuppressWarnings("unused")
     public void setCaching(boolean caching) {
         mCaching = caching;
     }
 
+    @SuppressWarnings("unused")
     public void setCacheScale(float scale) {
         mCacheScale = scale;
     }
 
+    @SuppressWarnings("unused")
     public void resetCache() {
         if (!mCaching) {
             throw new IllegalStateException("Cache is not enabled");

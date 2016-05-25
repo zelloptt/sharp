@@ -27,7 +27,7 @@ import java.util.HashMap;
 
 public class SvgColors {
 
-    private static HashMap<String, Integer> colors = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> colors = new HashMap<>();
 
     public static Integer mapColor(String color) {
         return colors.get(color.toLowerCase());
