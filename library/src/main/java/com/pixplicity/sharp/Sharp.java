@@ -303,9 +303,10 @@ public abstract class Sharp {
     }
 
     @SuppressWarnings("unused")
-    public void into(final View view) {
+    public void into(@NonNull final View view) {
+        SharpDrawable.prepareView(view);
         if (view instanceof ImageView) {
-            final SharpDrawable drawable = getDrawable(view);
+            final SharpDrawable drawable = getDrawable();
             if (Looper.myLooper() == Looper.getMainLooper()) {
                 // Set it immediately if on the main thread
                 ((ImageView) view).setImageDrawable(drawable);
@@ -352,6 +353,16 @@ public abstract class Sharp {
     /**
      * Processes the SVG and provides the resulting drawable. Runs on the main thread.
      */
+    @SuppressWarnings("unused")
+    public SharpDrawable getDrawable() {
+        return getSharpPicture().getDrawable();
+    }
+
+    /**
+     * Processes the SVG and provides the resulting drawable. Runs on the main thread.
+     * @deprecated Use {@link #getDrawable()} instead.
+     */
+    @Deprecated
     @SuppressWarnings("unused")
     public SharpDrawable getDrawable(View view) {
         return getSharpPicture().getDrawable(view);

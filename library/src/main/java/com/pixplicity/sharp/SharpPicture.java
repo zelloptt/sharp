@@ -92,12 +92,24 @@ public class SharpPicture {
     }
 
     /**
+     * Create a drawable from the SVG.
+     *
+     * @return the Drawable.
+     */
+    public SharpDrawable getDrawable() {
+        return new SharpDrawable(mPicture);
+    }
+
+    /**
      * Create a drawable from the SVG. A view may be provided so that it's LayerType is set to
      * LAYER_TYPE_SOFTWARE.
      *
      * @param view {@link View} that will hold this drawable
      * @return the Drawable.
+     *
+     * @deprecated Use {@link #getDrawable()} instead.
      */
+    @Deprecated
     public SharpDrawable getDrawable(@Nullable View view) {
         return new SharpDrawable(view, mPicture);
     }

@@ -51,19 +51,35 @@ public class SharpDrawable extends PictureDrawable {
 
     /**
      * Construct a new drawable referencing the specified picture. The picture
-     * may be null. A view may be provided so that it's LayerType is set to
+     * may be null.
+     *
+     * @param picture The picture to associate with the drawable. May be null.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public SharpDrawable(@Nullable Picture picture) {
+        super(picture);
+    }
+
+    /**
+     * Construct a new drawable referencing the specified picture. The picture
+     * may be null. A view may be provided so that its LayerType is set to
      * LAYER_TYPE_SOFTWARE.
      *
      * @param view    {@link View} that will hold this drawable
      * @param picture The picture to associate with the drawable. May be null.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public SharpDrawable(@Nullable View view, Picture picture) {
+    public SharpDrawable(@Nullable View view, @Nullable Picture picture) {
         super(picture);
         prepareView(view);
     }
 
-    static void prepareView(@Nullable final View view) {
+    /**
+     * Prepare a view for rendering this SharpDrawable by setting its LayerType to
+     * LAYER_TYPE_SOFTWARE.
+     * @param view
+     */
+    public static void prepareView(@Nullable final View view) {
         if (view != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             if (Looper.myLooper() == Looper.getMainLooper()) {
                 view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
