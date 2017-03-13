@@ -16,14 +16,14 @@ https://github.com/josefpavlik/svg-android
 Download [the latest AAR][download] or grab from Bintray using Gradle:
 
     dependencies {
-        compile 'com.pixplicity.sharp:library:[VERSION_HERE]@aar'
+        compile 'com.pixplicity.sharp:library:[VERSION_HERE]'
     }
 
 [![Download](https://api.bintray.com/packages/pixplicity/android/Sharp/images/download.svg)](https://bintray.com/pixplicity/android/Sharp/_latestVersion)
 
 **Important:** Specify the latest version from Bintray as `[VERSION_HERE]`.
 
-[download]: https://bintray.com/artifact/download/pixplicity/android/com/pixplicity/sharp/library/1.0/library-1.0.aar
+[download]: https://bintray.com/pixplicity/android/Sharp
 
 ## Sample
 
