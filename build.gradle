@@ -29,8 +29,6 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-allprojects {
-    repositories {
-        jcenter()
-    }
+subprojects {
+    tasks.withType(Javadoc).all { enabled = false }
 }
