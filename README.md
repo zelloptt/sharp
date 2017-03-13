@@ -15,9 +15,6 @@ https://github.com/josefpavlik/svg-android
 
 Download [the latest AAR][download] or grab from Bintray using Gradle:
 
-    repositories {
-        maven { url "http://dl.bintray.com/pixplicity/android" }
-    }
     dependencies {
         compile 'com.pixplicity.sharp:library:[VERSION_HERE]@aar'
     }
