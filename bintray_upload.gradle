@@ -17,14 +17,17 @@
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-group = GROUP
-version = VERSION_NAME
-
 bintray {
-    user = project.hasProperty("bintray.user") ? project.getProperty("bintray.user") : "empty"
-    key = project.hasProperty("bintray.apikey") ? project.getProperty("bintray.apikey") : "empty"
+    user = project.hasProperty("bintray.user") ? project.getProperty("bintray.user") : (System.getenv('BINTRAY_USER') ? System.getenv('BINTRAY_USER') : "empty")
+    key = project.hasProperty("bintray.apikey") ? project.getProperty("bintray.apikey") : (System.getenv('BINTRAY_KEY') ? System.getenv('BINTRAY_KEY') : "empty")
 
     configurations = ['archives'] //When uploading configuration files
+
+    dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
+    publish = true //[Default: false] Whether version should be auto published after an upload
+    override = false //[Default: false] Whether to override version artifacts already published
+
+    //Package configuration. The plugin will use the repo and name properties to check if the package already exists. In that case, there's no need to configure the other package properties (like userOrg, desc, etc).
     pkg {
         repo = 'android'
         userOrg = 'pixplicity'
@@ -42,60 +45,4 @@ bintray {
             released  = new Date()
         }
     }
-}
-
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'aar'
-                name project.name
-                url POM_URL
-                description POM_DESCRIPTION
-                licenses {
-                    license {
-                        name POM_LICENCE_NAME
-                        url POM_LICENCE_URL
-                        distribution POM_LICENCE_DIST
-                    }
-                }
-                developers {
-                    developer {
-                        id POM_DEVELOPER_ID_0
-                        name POM_DEVELOPER_NAME_0
-                        email POM_DEVELOPER_EMAIL_0
-                    }
-                }
-                scm {
-                    connection POM_SCM_CONNECTION
-                    developerConnection POM_SCM_DEV_CONNECTION
-                    url POM_URL
-                }
-            }
-        }
-    }
-}
-
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-task findConventions << {
-    println project.getConvention()
 }
