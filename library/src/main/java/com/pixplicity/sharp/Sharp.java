@@ -681,6 +681,7 @@ public abstract class Sharp {
         while (ph.pos < n) {
             char cmd = s.charAt(ph.pos);
             switch (cmd) {
+                case '.':
                 case '-':
                 case '+':
                 case '0':
