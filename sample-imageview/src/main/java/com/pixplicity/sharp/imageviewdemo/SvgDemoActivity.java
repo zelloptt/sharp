@@ -23,11 +23,17 @@
 
 package com.pixplicity.sharp.imageviewdemo;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -39,6 +45,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.pixplicity.sharp.OnSvgElementListener;
 import com.pixplicity.sharp.Sharp;
+import com.pixplicity.sharp.SharpDrawable;
 import com.pixplicity.sharp.SharpPicture;
 
 import java.util.Random;
@@ -49,6 +56,8 @@ public class SvgDemoActivity extends AppCompatActivity {
     private Button mButton;
 
     private Sharp mSvg;
+
+    private boolean mRenderBitmap = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +85,21 @@ public class SvgDemoActivity extends AppCompatActivity {
         });
 
         reloadSvg(false);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        new MenuInflater(this).inflate(R.menu.main, menu);
+        menu.findItem(R.id.action_render_bitmap).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                mRenderBitmap = !menuItem.isChecked();
+                menuItem.setChecked(mRenderBitmap);
+                reloadSvg(false);
+                return true;
+            }
+        });
+        return true;
     }
 
     private void reloadSvg(final boolean changeColor) {
@@ -118,7 +142,30 @@ public class SvgDemoActivity extends AppCompatActivity {
         mSvg.getSharpPicture(new Sharp.PictureCallback() {
             @Override
             public void onPictureReady(SharpPicture picture) {
-                mImageView.setImageDrawable(picture.getDrawable(mImageView));
+                Drawable drawable = picture.getDrawable();
+                if (mRenderBitmap) {
+                    // Create a bitmap with a size that is somewhat arbitrarily determined by SharpDrawable
+                    // This will no doubt look bad when scaled up, so perhaps a different dimension would be used in practice
+                    int width = Math.max(1, drawable.getIntrinsicWidth());
+                    int height = Math.max(1, drawable.getIntrinsicHeight());
+                    Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                    // Draw SharpDrawable onto this bitmap
+                    Canvas canvas = new Canvas(bitmap);
+                    drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                    drawable.draw(canvas);
+
+                    BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), bitmap);
+
+                    // You could do some bitmap operations here that aren't supported by Picture
+                    //bitmapDrawable.setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+                    //bitmapDrawable.setAlpha(100);
+
+                    // Use the BitmapDrawable instead of the SharpDrawable
+                    drawable = bitmapDrawable;
+                } else {
+                    SharpDrawable.prepareView(mImageView);
+                }
+                mImageView.setImageDrawable(drawable);
 
                 // We don't want to use the same drawable, as we're specifying a custom size; therefore
                 // we call createDrawable() instead of getDrawable()
