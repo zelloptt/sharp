@@ -27,30 +27,27 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.github.chrisbanes.photoview.PhotoView;
 import com.pixplicity.sharp.OnSvgElementListener;
 import com.pixplicity.sharp.Sharp;
 import com.pixplicity.sharp.SharpPicture;
 
 import java.util.Random;
 
-import uk.co.senab.photoview.PhotoViewAttacher;
-
 public class SvgDemoActivity extends AppCompatActivity {
 
-    private ImageView mImageView;
+    private PhotoView mImageView;
     private Button mButton;
 
-    private PhotoViewAttacher mAttacher;
     private Sharp mSvg;
 
     @Override
@@ -58,11 +55,11 @@ public class SvgDemoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_svg_demo);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mImageView = (ImageView) findViewById(R.id.iv_image);
-        mButton = (Button) findViewById(R.id.bt_button);
+        mImageView = findViewById(R.id.iv_image);
+        mButton = findViewById(R.id.bt_button);
 
         mSvg = Sharp.loadResource(getResources(), R.raw.cartman);
         // If you want to load typefaces from assets:
@@ -77,9 +74,6 @@ public class SvgDemoActivity extends AppCompatActivity {
                 reloadSvg(true);
             }
         });
-
-        mAttacher = new PhotoViewAttacher(mImageView);
-        mAttacher.setMaximumScale(10f);
 
         reloadSvg(false);
     }
@@ -124,22 +118,14 @@ public class SvgDemoActivity extends AppCompatActivity {
         mSvg.getSharpPicture(new Sharp.PictureCallback() {
             @Override
             public void onPictureReady(SharpPicture picture) {
-                {
-                    Drawable drawable = picture.getDrawable(mImageView);
-                    mImageView.setImageDrawable(drawable);
-                }
+                mImageView.setImageDrawable(picture.getDrawable(mImageView));
 
-                {
-                    // We don't want to use the same drawable, as we're specifying a custom size; therefore
-                    // we call createDrawable() instead of getDrawable()
-                    int iconSize = getResources().getDimensionPixelSize(R.dimen.icon_size);
-                    Drawable drawable = picture.createDrawable(mButton, iconSize);
-                    mButton.setCompoundDrawables(
-                            drawable,
-                            null, null, null);
-                }
-
-                mAttacher.update();
+                // We don't want to use the same drawable, as we're specifying a custom size; therefore
+                // we call createDrawable() instead of getDrawable()
+                int iconSize = getResources().getDimensionPixelSize(R.dimen.icon_size);
+                mButton.setCompoundDrawables(
+                        picture.createDrawable(mButton, iconSize),
+                        null, null, null);
             }
         });
     }

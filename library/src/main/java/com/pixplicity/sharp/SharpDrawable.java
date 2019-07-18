@@ -31,7 +31,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.PictureDrawable;
 import android.os.Build;
 import android.os.Looper;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 

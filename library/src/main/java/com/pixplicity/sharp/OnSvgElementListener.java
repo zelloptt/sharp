@@ -26,8 +26,8 @@ package com.pixplicity.sharp;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 @SuppressWarnings("unused")
 public interface OnSvgElementListener {
