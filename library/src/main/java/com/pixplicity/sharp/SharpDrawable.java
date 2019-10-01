@@ -133,6 +133,7 @@ public class SharpDrawable extends PictureDrawable {
                 Log.v(TAG, "canvas " + canvas.getWidth() + "x" + canvas.getHeight());
                 Log.v(TAG, "bounds " + bounds.toString());
                 canvas.translate(bounds.left, bounds.top);
+                onBeforeScaleAndDraw();
                 canvas.scale(mScaleX, mScaleY, 0, 0);
                 canvas.drawPicture(picture);
                 canvas.restore();
@@ -198,6 +199,10 @@ public class SharpDrawable extends PictureDrawable {
             mCacheBitmap.recycle();
             mCacheBitmap = null;
         }
+    }
+
+    @SuppressWarnings("unused")
+    protected void onBeforeScaleAndDraw() {
     }
 
     private void save(Canvas canvas) {
