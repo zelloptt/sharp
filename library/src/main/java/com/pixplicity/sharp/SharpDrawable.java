@@ -133,7 +133,7 @@ public class SharpDrawable extends PictureDrawable {
                 Log.v(TAG, "canvas " + canvas.getWidth() + "x" + canvas.getHeight());
                 Log.v(TAG, "bounds " + bounds.toString());
                 canvas.translate(bounds.left, bounds.top);
-                onBeforeScaleAndDraw();
+                onBeforeScaleAndDraw(canvas, picture, bounds);
                 canvas.scale(mScaleX, mScaleY, 0, 0);
                 canvas.drawPicture(picture);
                 canvas.restore();
@@ -202,7 +202,7 @@ public class SharpDrawable extends PictureDrawable {
     }
 
     @SuppressWarnings("unused")
-    protected void onBeforeScaleAndDraw() {
+    protected void onBeforeScaleAndDraw(Canvas canvas, Picture picture, Rect bounds) {
     }
 
     private void save(Canvas canvas) {
