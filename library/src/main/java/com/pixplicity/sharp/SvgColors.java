@@ -24,13 +24,14 @@
 package com.pixplicity.sharp;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 public class SvgColors {
 
     private static HashMap<String, Integer> colors = new HashMap<>();
 
     public static Integer mapColor(String color) {
-        return colors.get(color.toLowerCase());
+        return colors.get(color.toLowerCase(Locale.US));
     }
 
     static {
