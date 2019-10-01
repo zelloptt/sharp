@@ -97,7 +97,9 @@ public class SharpPicture {
      * @return the Drawable.
      */
     public SharpDrawable getDrawable() {
-        return new SharpDrawable(mPicture);
+        SharpDrawable drawable = new SharpDrawable(mPicture);
+        drawable.setBounds((int) mBounds.left, (int) mBounds.top, (int) Math.ceil(mBounds.right), (int) Math.ceil(mBounds.bottom));
+        return drawable;
     }
 
     /**
@@ -110,8 +112,10 @@ public class SharpPicture {
      * @deprecated Use {@link #getDrawable()} instead.
      */
     @Deprecated
-    public SharpDrawable getDrawable(@Nullable View view) {
-        return new SharpDrawable(view, mPicture);
+    public SharpDrawable getDrawable(@androidx.annotation.Nullable View view) {
+        SharpDrawable drawable = new SharpDrawable(view, mPicture);
+        drawable.setBounds((int) mBounds.left, (int) mBounds.top, (int) Math.ceil(mBounds.right), (int) Math.ceil(mBounds.bottom));
+        return drawable;
     }
 
     /**

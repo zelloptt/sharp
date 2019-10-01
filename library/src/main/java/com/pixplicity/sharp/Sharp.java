@@ -1710,12 +1710,14 @@ public abstract class Sharp {
             }
 
             if (localName.equals("svg")) {
-                float width = -1, height = -1;
+                float x = 0, y = 0, width = -1, height = -1;
                 String viewBox = getStringAttr("viewBox", atts);
                 if (viewBox != null) {
                     // Prefer viewBox
                     String coords[] = viewBox.split(" ");
                     if (coords.length == 4) {
+                        x = parseFloat(coords[0], 0f);
+                        y = parseFloat(coords[1], 0f);
                         width = parseFloat(coords[2], -1f);
                         height = parseFloat(coords[3], -1f);
                     }
@@ -1732,11 +1734,12 @@ public abstract class Sharp {
                     height = 100;
                     Log.w(TAG, "element '" + localName + "' does not provide its dimensions; using " + width + "x" + height);
                 }
-                mBounds = new RectF(0, 0, width, height);
+                mBounds = new RectF(x, y, x + width, y + height);
                 //Log.d(TAG, "svg boundaries: " + mBounds);
                 mCanvas = mPicture.beginRecording(
                         (int) Math.ceil(mBounds.width()),
                         (int) Math.ceil(mBounds.height()));
+                mCanvas.translate(-mBounds.left, -mBounds.top);
                 //Log.d(TAG, "canvas size: " + mCanvas.getWidth() + "x" + mCanvas.getHeight());
                 onSvgStart();
             } else if (localName.equals("defs")) {
