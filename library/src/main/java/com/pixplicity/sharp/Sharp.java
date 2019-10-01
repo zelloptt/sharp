@@ -28,6 +28,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -1447,6 +1448,17 @@ public abstract class Sharp {
                 if (width != null) {
                     mStrokePaint.setStrokeWidth(width);
                 }
+
+                String dashArray = atts.getString("stroke-dasharray");
+                if (dashArray != null && !dashArray.equalsIgnoreCase("none")) {
+                    String[] splitDashArray = dashArray.split(", ?");
+                    float[] intervals = new float[splitDashArray.length];
+                    for (int i = 0; i < splitDashArray.length; i++) {
+                        intervals[i] = Float.parseFloat(splitDashArray[i]);
+                    }
+                    mStrokePaint.setPathEffect(new DashPathEffect(intervals, 0));
+                }
+
                 String linecap = atts.getString("stroke-linecap");
                 if ("round".equals(linecap)) {
                     mStrokePaint.setStrokeCap(Paint.Cap.ROUND);
