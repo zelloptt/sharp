@@ -104,7 +104,7 @@ public abstract class Sharp {
         PERCENT("%"),
         PT("pt"),
         PX("px"),
-        MM("mm", 100),;
+        MM("mm", 100);
 
         public final String mAbbreviation;
         public final float mScaleFactor;
@@ -361,6 +361,7 @@ public abstract class Sharp {
 
     /**
      * Processes the SVG and provides the resulting drawable. Runs on the main thread.
+     *
      * @deprecated Use {@link #getDrawable()} instead.
      */
     @Deprecated
@@ -578,7 +579,7 @@ public abstract class Sharp {
                         0,
                         0,
                         1,
-                        });
+                });
             }
         }
 
@@ -1187,7 +1188,7 @@ public abstract class Sharp {
                     return null;
                 }
             } else if (v.startsWith("rgb(") && v.endsWith(")")) {
-                String values[] = v.substring(4, v.length() - 1).split(",");
+                String[] values = v.substring(4, v.length() - 1).split(",");
                 try {
                     return rgb(parseNum(values[0]), parseNum(values[1]), parseNum(values[2]));
                 } catch (NumberFormatException nfe) {
@@ -1714,7 +1715,7 @@ public abstract class Sharp {
                 String viewBox = getStringAttr("viewBox", atts);
                 if (viewBox != null) {
                     // Prefer viewBox
-                    String coords[] = viewBox.split(" ");
+                    String[] coords = viewBox.split(" ");
                     if (coords.length == 4) {
                         x = parseFloat(coords[0], 0f);
                         y = parseFloat(coords[1], 0f);
@@ -2008,7 +2009,7 @@ public abstract class Sharp {
         }
 
         @Override
-        public void characters(char ch[], int start, int length) {
+        public void characters(char[] ch, int start, int length) {
             if (!mTextStack.isEmpty()) {
                 mTextStack.peek().setText(ch, start, length);
             }

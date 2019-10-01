@@ -31,9 +31,10 @@ import android.graphics.Rect;
 import android.graphics.drawable.PictureDrawable;
 import android.os.Build;
 import android.os.Looper;
-import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
+
+import androidx.annotation.Nullable;
 
 public class SharpDrawable extends PictureDrawable {
 
@@ -78,6 +79,7 @@ public class SharpDrawable extends PictureDrawable {
     /**
      * Prepare a view for rendering this SharpDrawable by setting its LayerType to
      * LAYER_TYPE_SOFTWARE.
+     *
      * @param view
      */
     public static void prepareView(@Nullable final View view) {
