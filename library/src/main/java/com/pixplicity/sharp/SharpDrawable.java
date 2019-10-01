@@ -48,6 +48,7 @@ public class SharpDrawable extends PictureDrawable {
     private Rect mCacheBounds;
     private Bitmap mCacheBitmap;
     private float mCacheScale = 1f;
+    private int alpha = 255;
 
     /**
      * Construct a new drawable referencing the specified picture. The picture
@@ -120,14 +121,14 @@ public class SharpDrawable extends PictureDrawable {
                     }
                     // start drawing onto this bitmap
                     canvas = new Canvas(mCacheBitmap);
-                    canvas.save();
+                    save(canvas);
                     canvas.scale(mCacheScale, mCacheScale);
                 }
             } else {
                 canvas = parentCanvas;
             }
             if (canvas != null) {
-                canvas.save();
+                save(canvas);
                 canvas.clipRect(bounds);
                 Log.v(TAG, "canvas " + canvas.getWidth() + "x" + canvas.getHeight());
                 Log.v(TAG, "bounds " + bounds.toString());
@@ -140,7 +141,7 @@ public class SharpDrawable extends PictureDrawable {
                 if (canvas != null) {
                     canvas.restore();
                 }
-                parentCanvas.save();
+                save(parentCanvas);
                 parentCanvas.scale(1f / mCacheScale, 1f / mCacheScale, 0, 0);
                 parentCanvas.drawBitmap(mCacheBitmap, 0, 0, null);
                 parentCanvas.restore();
@@ -157,6 +158,17 @@ public class SharpDrawable extends PictureDrawable {
         mScaleX = (float) width / (float) picture.getWidth();
         mScaleY = (float) height / (float) picture.getHeight();
         super.setBounds(left, top, right, bottom);
+    }
+
+    @Override
+    public int getAlpha() {
+        return alpha;
+    }
+
+    @Override
+    public void setAlpha(int alpha) {
+        this.alpha = alpha;
+        invalidateSelf();
     }
 
     /**
@@ -188,4 +200,11 @@ public class SharpDrawable extends PictureDrawable {
         }
     }
 
+    private void save(Canvas canvas) {
+        if (alpha == 255 || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            canvas.save();
+        } else {
+            canvas.saveLayerAlpha(0, 0, canvas.getWidth(), canvas.getHeight(), alpha);
+        }
+    }
 }
