@@ -1769,14 +1769,12 @@ public abstract class Sharp {
                 }
                 if (hidden) {
                     hiddenLevel++;
-                    //Log.d(TAG, "Hidden up: " + hiddenLevel);
                 }
                 // Go in to hidden mode if display is "none"
                 if ("none".equals(props.getString("display"))) {
                     if (!hidden) {
                         hidden = true;
                         hiddenLevel = 1;
-                        //Log.d(TAG, "Hidden up: " + hiddenLevel);
                     }
                 }
 
@@ -1996,6 +1994,8 @@ public abstract class Sharp {
                 mTextStack.push(new SvgText(atts, mTextStack.isEmpty() ? null : mTextStack.peek()));
             } else if (!hidden && localName.equals("tspan")) {
                 mTextStack.push(new SvgText(atts, mTextStack.isEmpty() ? null : mTextStack.peek()));
+            } else if (!hidden && localName.equals("clipPath")) {
+                hide();
             } else if (!hidden) {
                 switch (localName) {
                     case "metadata":
@@ -2006,6 +2006,15 @@ public abstract class Sharp {
                         Log.w(TAG, "Unrecognized SVG command: " + localName);
                         break;
                 }
+            }
+        }
+
+        private void hide() {
+            if (!hidden) {
+                hidden = true;
+                hiddenLevel = 1;
+            } else {
+                hiddenLevel++;
             }
         }
 
@@ -2059,13 +2068,7 @@ public abstract class Sharp {
                         boundsMode = false;
                     }
                     // Break out of hidden mode
-                    if (hidden) {
-                        hiddenLevel--;
-                        //Log.d(TAG, "Hidden down: " + hiddenLevel);
-                        if (hiddenLevel == 0) {
-                            hidden = false;
-                        }
-                    }
+                    unhide();
                     // Clear gradient map
                     //gradientRefMap.clear();
                     popTransform();
@@ -2077,6 +2080,19 @@ public abstract class Sharp {
                     // Restore the previous canvas
                     mCanvas.restore();
                     break;
+                case "clipPath":
+                    // Break out of hidden mode
+                    unhide();
+                    break;
+            }
+        }
+
+        private void unhide() {
+            if (hidden) {
+                hiddenLevel--;
+                if (hiddenLevel == 0) {
+                    hidden = false;
+                }
             }
         }
 
