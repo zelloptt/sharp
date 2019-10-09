@@ -2023,6 +2023,9 @@ public abstract class Sharp {
                 mTextStack.push(new SvgText(atts, mTextStack.isEmpty() ? null : mTextStack.peek()));
             } else if (!hidden && localName.equals("clipPath")) {
                 hide();
+                if (LOG_LEVEL >= LOG_LEVEL_WARN) {
+                    Log.w(TAG, "Unsupported SVG command: " + localName);
+                }
             } else if (!hidden) {
                 switch (localName) {
                     case "metadata":
