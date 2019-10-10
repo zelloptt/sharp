@@ -15,8 +15,8 @@ android {
     defaultConfig {
         minSdkVersion 11
         targetSdkVersion 29
-        versionCode 6
-        versionName "1.1.2"
+        versionCode 7
+        versionName "1.1.3"
         archivesBaseName = "$archivesBaseName-$versionName"
     }
 
@@ -72,7 +72,7 @@ publish {
     bintrayUser = props['BINTRAY_USER']
     bintrayKey = props['BINTRAY_KEY']
     artifactId = 'library'
-    publishVersion = '1.1.2'
+    publishVersion = '1.1.3'
     desc = 'Sharp is a Scalable Vector Graphics (SVG) implementation for Android. It facilitates loading vector graphics as SharpDrawables, and can effectively be used wherever a conventional image would be displayed, whether it be as a background, ImageView source, inside a StateListDrawable or used as composites in a TextView.'
     website = 'https://github.com/Pixplicity/sharp'
     licences = ['Apache-2.0']
