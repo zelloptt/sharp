@@ -57,7 +57,7 @@ android {
 }
 
 // For building a release variant and uploading to bintray, execute:
-// $ ./gradlew clean build bintrayUpload
+// $ ./gradlew clean build publishReleasePublicationToMavenLocal bintrayUpload
 Properties props = new Properties()
 try {
     props.load(new FileInputStream(".signing/bintray.properties"))
@@ -66,6 +66,8 @@ try {
 }
 publish {
     userOrg = 'pixplicity'
+    repoName = 'android'
+    uploadName = 'Sharp'
     groupId = 'com.pixplicity.sharp'
     bintrayUser = props['BINTRAY_USER']
     bintrayKey = props['BINTRAY_KEY']
