@@ -1439,6 +1439,7 @@ public abstract class Sharp {
             if (strokeString != null) {
                 if (strokeString.equalsIgnoreCase("none")) {
                     mStrokePaint.setShader(null);
+                    mStrokePaint.setPathEffect(null);
                     mStrokePaint.setColor(Color.TRANSPARENT);
                     // optimization: return false if transparent
                     return false;
@@ -1459,6 +1460,8 @@ public abstract class Sharp {
                         intervals[i] = Float.parseFloat(splitDashArray[i]);
                     }
                     mStrokePaint.setPathEffect(new DashPathEffect(intervals, 0));
+                } else {
+                    mStrokePaint.setPathEffect(null);
                 }
 
                 String linecap = atts.getString("stroke-linecap");
