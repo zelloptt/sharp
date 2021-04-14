@@ -8,16 +8,13 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.1'
+        classpath 'com.android.tools.build:gradle:4.0.2'
 
         // Code checks
         classpath 'com.noveogroup.android:check:1.2.2'
 
         // used to generate a POM file
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
-
-        // Plugin used to upload authenticated files to BinTray through Gradle
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4"
     }
 }
 
